@@ -2,27 +2,42 @@
 from pytube import YouTube
 import os
 
+
 def download(url):
     yt = YouTube(str(url))
     video = yt.streams.filter(only_audio=True).first()
 
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    path = dir_path + "\\MusicQueue"
+    # Check whether the specified path exists or not
+    isExist = os.path.exists(path)
+    if not isExist:
+        os.makedirs(path)
+
     # check for destination to save file
-    print("Enter the destination (leave blank for current directory)")
-    destination = '.'
+    #print("Enter the destination (leave blank for current directory)")
+    destination = path
 
     # download the file
     out_file = video.download(output_path=destination)
 
     # save the file
     base, ext = os.path.splitext(out_file)
-    #new_file = base + '.mp3'
-    new_file = "MUSIC.mp3"  #TODO: Need to make different names for music files
-    #TODO: Idea: maybe create a folder for music files, name them by # ex, 1, 2, 3, 4, etc... Wipe out folder when it exceeds 10 or so - that folder will be used as a queue.
+    extension = '.mp3'
+    suffix = ""
+    i = 1
+    while os.path.exists(base + suffix + extension):
+        suffix += str(i)
+        i += 1
+    new_file = base + suffix + extension
+
     os.rename(out_file, new_file)
 
     # result of success
     print(yt.title + " has been successfully downloaded.")
-    return new_file
+    print(base)
+    filepath = os.path.join(destination, yt.title + suffix + extension)
+    return filepath
 
 
 if __name__ == "__main__":

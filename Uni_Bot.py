@@ -7,6 +7,7 @@ from discord import FFmpegAudio
 import asyncio
 import os
 from VidDownloader import download
+import queue
 
 """ERROR LOGGING"""
 logger = logging.getLogger('discord')
@@ -39,6 +40,10 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+MusicQueue = queue.Queue()
+successful_join = False
+vc = None
+playingNOW = False
 
 @bot.event
 async def on_ready():
@@ -111,17 +116,25 @@ async def play_tune1(ctx):
 
 @bot.command(name="Join")
 async def join(ctx):
+    global successful_join
+    global vc
     try:  #Checks if user is in a voice channel
         channel = ctx.author.voice.channel
-        await channel.connect()
+        if not successful_join:
+            vc = await channel.connect()
+            successful_join = True
         return True
     except:
         await ctx.send("User must be in a voice channel")
-        return False
+        return True
 
 @bot.command(name="Leave")
 async def leave(ctx):
+    global successful_join
+    global vc
     await ctx.voice_client.disconnect()
+    successful_join = False
+    vc = None
     #TODO: Add case for deleting music file after leave
 file_path = os.path.realpath(__file__)
 
@@ -130,10 +143,9 @@ async def dl(ctx, url):
     download(url)
 
 
-@bot.command(name="Play")
+@bot.command(name="PlayNOW")
 async def PlayYT(ctx, url):
     file = download(url)
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     successful_join = join(ctx)
     if successful_join:  # Only proceed with music if user is actually in vc
         channel = ctx.author.voice.channel  # Note the channel to play music in
@@ -147,6 +159,40 @@ async def PlayYT(ctx, url):
     else:
         await ctx.send("User is not in a voice channel.")
 
+    #TODO: Implement herald bot functionality
+
+@bot.command(name="Play")
+async def PlayEnqueue(ctx, url):
+    file = download(url)
+    global successful_join
+    global vc
+    await join(ctx)
+    if successful_join:  # Only proceed with music if user is actually in vc
+        global MusicQueue
+        MusicQueue.put((ctx, file))
+    else:
+        await ctx.send("User is not in a voice channel.")
+    if not playingNOW:
+        await PlayQ(ctx)
+
+
+@bot.command(name="PlayQueue")
+async def PlayQ(ctx):
+    global playingNOW
+    global vc
+    playingNOW = True
+    while not MusicQueue.empty():
+        print("PLAY SONG NOW")
+        Current = MusicQueue.get()
+        vc = Current[0].author.voice.channel
+        CurrentSongFilePath = Current[1]
+        player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",source=CurrentSongFilePath))
+        player.start()
+        while not player.is_done():
+            await asyncio.sleep(1)
+        player.stop()
+        print(Current[1])
+        os.remove(CurrentSongFilePath)
 
 """STARTUP"""
 # Assume client refers to a discord.Client subclass...

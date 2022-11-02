@@ -968,3 +968,922 @@ TypeError: PlayYT.<locals>.<lambda>() takes 0 positional arguments but 1 was giv
 [2022-10-29 11:36:03] [INFO    ] discord.player: ffmpeg process 22248 successfully terminated with return code of 0.
 [2022-10-29 11:38:14] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
 [2022-10-29 11:38:14] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 19:20:48] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:20:48] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:20:48] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:20:49] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 778cba49fb1b284844d643aef5d39004).
+[2022-10-31 19:21:11] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 156, in PlayEnqueue
+    file = download(url)
+  File "D:\kevin\Git Repos\Unicron_Bot\VidDownloader.py", line 34, in download
+    os.rename(out_file, new_file)
+OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'D:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp4' -> 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueueD:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp3'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'D:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp4' -> 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueueD:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp3'
+[2022-10-31 19:23:32] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 156, in PlayEnqueue
+    file = download(url)
+  File "D:\kevin\Git Repos\Unicron_Bot\VidDownloader.py", line 34, in download
+    os.rename(out_file, new_file)
+OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'D:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp4' -> 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueueD:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp3'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: OSError: [WinError 123] The filename, directory name, or volume label syntax is incorrect: 'D:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp4' -> 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueueD:\\kevin\\Git Repos\\Unicron_Bot\\.\\WATCH ME SWOOCE RIGHT IN.mp3'
+[2022-10-31 19:23:52] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:23:52] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:23:52] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:23:53] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 1728f5d8bbe6f1b0bdb5703b8a36986c).
+[2022-10-31 19:24:06] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:24:06] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:24:07] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:24:07] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 164, in PlayEnqueue
+    while not player.is_done():
+AttributeError: 'NoneType' object has no attribute 'is_done'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'is_done'
+[2022-10-31 19:24:07] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:24:07] [INFO    ] discord.player: ffmpeg process 10444 successfully terminated with return code of 1.
+[2022-10-31 19:24:55] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:25:08] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:25:08] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:25:08] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:25:08] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 30db353f5e056e2453ab953eea0fef2a).
+[2022-10-31 19:25:17] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 156, in PlayEnqueue
+    file = download(url)
+  File "D:\kevin\Git Repos\Unicron_Bot\VidDownloader.py", line 34, in download
+    os.rename(out_file, new_file)
+FileExistsError: [WinError 183] Cannot create a file when that file already exists: 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueue\\WATCH ME SWOOCE RIGHT IN.mp4' -> 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueue\\WATCH ME SWOOCE RIGHT IN.mp31'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: FileExistsError: [WinError 183] Cannot create a file when that file already exists: 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueue\\WATCH ME SWOOCE RIGHT IN.mp4' -> 'D:\\kevin\\Git Repos\\Unicron_Bot\\MusicQueue\\WATCH ME SWOOCE RIGHT IN.mp31'
+[2022-10-31 19:26:25] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:26:25] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:26:25] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:26:25] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 5cb7f642b8e376b1906c691e2415e39e).
+[2022-10-31 19:26:36] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:26:36] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:26:36] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:26:36] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 164, in PlayEnqueue
+    while not player.is_done():
+AttributeError: 'NoneType' object has no attribute 'is_done'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'is_done'
+[2022-10-31 19:26:36] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:26:36] [INFO    ] discord.player: ffmpeg process 17648 successfully terminated with return code of 1.
+[2022-10-31 19:27:04] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 160, in PlayEnqueue
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-10-31 19:31:13] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:31:16] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:31:16] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:31:16] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:31:16] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 3d82e00267145e4fbd43bce2b5dad29f).
+[2022-10-31 19:31:26] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:31:26] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:31:26] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:31:26] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 166, in PlayEnqueue
+    while not player.is_done():
+AttributeError: 'NoneType' object has no attribute 'is_done'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'is_done'
+[2022-10-31 19:31:26] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:31:26] [INFO    ] discord.player: ffmpeg process 26076 successfully terminated with return code of 1.
+[2022-10-31 19:32:40] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:32:42] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:32:42] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:32:42] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:32:43] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: ca83fd5d0eca41a5a0aa3ef9cc36f66c).
+[2022-10-31 19:32:52] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:32:52] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:32:52] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:32:52] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:32:52] [INFO    ] discord.player: ffmpeg process 4432 successfully terminated with return code of 1.
+[2022-10-31 19:33:33] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 162, in PlayEnqueue
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-10-31 19:33:40] [ERROR   ] discord.voice_client: Disconnected from voice... Reconnecting in 0.65s.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 456, in poll_voice_ws
+    await self.ws.poll_event()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\gateway.py", line 1005, in poll_event
+    raise ConnectionClosed(self.ws, shard_id=None, code=self._close_code)
+discord.errors.ConnectionClosed: Shard ID None WebSocket closed with 1006
+[2022-10-31 19:33:40] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session ca83fd5d0eca41a5a0aa3ef9cc36f66c.
+[2022-10-31 19:33:41] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:33:41] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:33:41] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 2)
+[2022-10-31 19:33:41] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:34:05] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 162, in PlayEnqueue
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-10-31 19:39:24] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:39:26] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:39:26] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:39:26] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:39:26] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 4d9cd95852522cb99d479d09cea463e1).
+[2022-10-31 19:39:33] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:39:33] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:39:33] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:39:33] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:39:33] [INFO    ] discord.player: ffmpeg process 19408 successfully terminated with return code of 1.
+[2022-10-31 19:39:42] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 163, in PlayEnqueue
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-10-31 19:42:52] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:43:09] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:43:09] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:43:09] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:43:09] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: e8746bb5164a0c94f37baaa026cb2cba).
+[2022-10-31 19:43:16] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:43:16] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:43:16] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:43:16] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:43:16] [INFO    ] discord.player: ffmpeg process 22744 successfully terminated with return code of 1.
+[2022-10-31 19:43:37] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:43:37] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 19:43:43] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "join" is not found
+[2022-10-31 19:44:08] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:44:08] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:44:08] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:44:08] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: b163a809e4a79de20667c1d7644ac7d2).
+[2022-10-31 19:44:13] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:44:13] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:44:13] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:44:22] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:44:22] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 19:44:42] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:44:42] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:44:42] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:44:42] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 0c6cbcef66dbfedd1d490b5ec51654ee).
+[2022-10-31 19:44:46] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:44:46] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:44:46] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:44:51] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:44:51] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 19:44:54] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:44:54] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:44:54] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:44:56] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:44:56] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 19:44:58] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:44:58] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:44:59] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7987.discord.media
+[2022-10-31 19:45:13] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 166, in PlayEnqueue
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-10-31 19:48:34] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:48:43] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:48:43] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:48:43] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:48:44] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 9f92f3cb8f566cd61830453f8d9816ae).
+[2022-10-31 19:48:52] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 171, in PlayEnqueue
+    player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source="D:/kevin/Git Repos/Unicron_Bot/"+ file), after=lambda: print('done'))
+AttributeError: 'NoneType' object has no attribute 'play'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'play'
+[2022-10-31 19:50:52] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:50:53] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:50:53] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:50:53] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 00f5ce153ecc7112dab3dc928cf9a5a2).
+[2022-10-31 19:52:29] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 19:52:29] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 19:52:29] [INFO    ] discord.client: logging in using static token
+[2022-10-31 19:52:30] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 2138ef9f8192ceedac3fbfce715869c2).
+[2022-10-31 19:52:37] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:52:37] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:52:37] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 19:52:37] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 19:52:37] [INFO    ] discord.player: ffmpeg process 16484 successfully terminated with return code of 1.
+[2022-10-31 19:58:40] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 107, in play_tune1
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-10-31 19:58:48] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 19:58:48] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 19:58:51] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 19:58:51] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 19:58:51] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 19:58:51] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 109, in play_tune1
+    player.start()
+AttributeError: 'NoneType' object has no attribute 'start'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'start'
+[2022-10-31 20:00:36] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:00:36] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 20:00:36] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-10-31 20:00:36] [INFO    ] discord.player: ffmpeg process 5700 has not terminated. Waiting to terminate...
+[2022-10-31 20:00:36] [INFO    ] discord.player: ffmpeg process 5700 should have terminated with a return code of 1.
+[2022-10-31 20:00:45] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:00:45] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:00:45] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:00:45] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: PlayEnqueue.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-10-31 20:00:45] [INFO    ] discord.player: ffmpeg process 30432 successfully terminated with return code of 1.
+[2022-10-31 20:01:48] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:01:52] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:01:52] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:01:52] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:01:52] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: a31184b540e2c445251507a56b791b84).
+[2022-10-31 20:01:59] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:01:59] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:01:59] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:01:59] [INFO    ] discord.player: ffmpeg process 31172 successfully terminated with return code of 1.
+[2022-10-31 20:02:41] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:02:43] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:02:43] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:02:43] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:02:43] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 2acb669bed0faf85177b497f11272659).
+[2022-10-31 20:02:48] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:02:48] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:02:48] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:02:48] [INFO    ] discord.player: ffmpeg process 26696 successfully terminated with return code of 1.
+[2022-10-31 20:03:10] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:03:12] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:03:12] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:03:12] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:03:13] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: f9ef3f7832269035ebe0119e01f5c08e).
+[2022-10-31 20:03:17] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:03:17] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:03:17] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:03:17] [INFO    ] discord.player: ffmpeg process 30664 successfully terminated with return code of 1.
+[2022-10-31 20:04:54] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:04:56] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:04:56] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:04:56] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:04:56] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: fe34e64e6bc44dc450e207930b133507).
+[2022-10-31 20:05:02] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:05:02] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:05:02] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:05:02] [INFO    ] discord.player: ffmpeg process 18796 successfully terminated with return code of 1.
+[2022-10-31 20:05:42] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:05:44] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:05:44] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:05:44] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:05:44] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: ab85d2f1909e7c0db3e032918e5ffa58).
+[2022-10-31 20:05:50] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:05:50] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:05:50] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:05:50] [INFO    ] discord.player: ffmpeg process 29280 successfully terminated with return code of 1.
+[2022-10-31 20:10:33] [INFO    ] discord.player: ffmpeg process 16928 successfully terminated with return code of 1.
+[2022-10-31 20:10:40] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:10:42] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:10:42] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:10:42] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:10:42] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: fe9c3cb9825215dbf1a5a3cabe6f7515).
+[2022-10-31 20:10:47] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:10:47] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:10:47] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:10:47] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 181, in PlayEnqueue
+    os.remove(file, 'r')  #TODO: File isn't actually getting deleted
+TypeError: remove() takes exactly 1 positional argument (2 given)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: TypeError: remove() takes exactly 1 positional argument (2 given)
+[2022-10-31 20:10:47] [INFO    ] discord.player: ffmpeg process 19872 successfully terminated with return code of 1.
+[2022-10-31 20:11:43] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:14:29] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:14:29] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:14:29] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:14:29] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 192c667363b6986499625a0a492940c1).
+[2022-10-31 20:14:37] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:14:37] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:14:37] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:14:37] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 181, in PlayEnqueue
+    os.remove(file, 'r')  #TODO: File isn't actually getting deleted
+TypeError: remove() takes exactly 1 positional argument (2 given)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: TypeError: remove() takes exactly 1 positional argument (2 given)
+[2022-10-31 20:14:37] [INFO    ] discord.player: ffmpeg process 3648 successfully terminated with return code of 1.
+[2022-10-31 20:14:56] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:14:57] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:14:57] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:14:57] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:14:58] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: dfbc038b70e84c26f4c18b9d2856280d).
+[2022-10-31 20:15:02] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:15:02] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:15:02] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:15:02] [INFO    ] discord.player: ffmpeg process 31080 successfully terminated with return code of 1.
+[2022-10-31 20:25:57] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:26:12] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:26:12] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:26:12] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:26:12] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: c21df16aa14a905ed76f225a161fe421).
+[2022-10-31 20:26:23] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:26:23] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:26:23] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:26:24] [INFO    ] discord.player: ffmpeg process 7724 successfully terminated with return code of 1.
+[2022-10-31 20:33:26] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 20:33:30] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-10-31 20:33:30] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-10-31 20:33:30] [INFO    ] discord.client: logging in using static token
+[2022-10-31 20:33:30] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 37b60aa0a106ca202f4d0b4d68f47d19).
+[2022-10-31 20:34:56] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-10-31 20:34:56] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-10-31 20:34:56] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-10-31 20:34:56] [INFO    ] discord.player: ffmpeg process 4976 successfully terminated with return code of 1.
+[2022-10-31 21:00:44] [INFO    ] discord.gateway: Shard ID None has successfully RESUMED session 37b60aa0a106ca202f4d0b4d68f47d19.
+[2022-10-31 21:04:33] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-10-31 21:04:33] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 17:42:32] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 17:42:32] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 17:42:32] [INFO    ] discord.client: logging in using static token
+[2022-11-01 17:42:32] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 94e5cb4cd299e207bafdad4023de93f6).
+[2022-11-01 17:43:06] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 17:43:06] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 17:43:06] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 17:43:07] [INFO    ] discord.player: ffmpeg process 27836 successfully terminated with return code of 1.
+[2022-11-01 17:45:05] [INFO    ] discord.player: ffmpeg process 2156 successfully terminated with return code of 1.
+[2022-11-01 17:52:03] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 17:52:10] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 17:52:10] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 17:52:10] [INFO    ] discord.client: logging in using static token
+[2022-11-01 17:52:10] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: e0655d0875625f7fb2b27670abfb3ac7).
+[2022-11-01 17:52:18] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 17:52:18] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 17:52:18] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 17:54:28] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 107, in play_tune1
+    vc = await channel.connect()
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\abc.py", line 1868, in connect
+    raise ClientException('Already connected to a voice channel.')
+discord.errors.ClientException: Already connected to a voice channel.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: ClientException: Already connected to a voice channel.
+[2022-11-01 17:54:38] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 17:54:38] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 17:54:49] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 17:54:49] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 17:54:49] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 17:54:50] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 109, in play_tune1
+    player.start()
+AttributeError: 'NoneType' object has no attribute 'start'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'start'
+[2022-11-01 17:55:16] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command test2
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 978, in invoke
+    await self.prepare(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 895, in prepare
+    await self._parse_arguments(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 802, in _parse_arguments
+    transformed = await self.transform(ctx, param, attachments)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 654, in transform
+    raise MissingRequiredArgument(param)
+discord.ext.commands.errors.MissingRequiredArgument: arg is a required argument that is missing.
+[2022-11-01 18:00:54] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-11-01 18:00:54] [INFO    ] discord.player: ffmpeg process 21368 successfully terminated with return code of 0.
+[2022-11-01 18:02:37] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:02:39] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:02:39] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:02:39] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:02:39] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: a11da7938d9fd8a1039299ac3beb2793).
+[2022-11-01 18:02:51] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:02:51] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:02:51] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:02:59] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:02:59] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 18:06:15] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:06:15] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:06:15] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:06:15] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 9a5be23fab84cc94d483884cb6a9e9e6).
+[2022-11-01 18:06:21] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:06:21] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:06:21] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:06:21] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 176, in PlayEnqueue
+    await PlayQ
+TypeError: object Command can't be used in 'await' expression
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: TypeError: object Command can't be used in 'await' expression
+[2022-11-01 18:06:33] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:06:36] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:06:36] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:06:36] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:06:37] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 609170b7a9a39723a74543321f21235e).
+[2022-11-01 18:06:43] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:06:43] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:06:43] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:06:44] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 176, in PlayEnqueue
+    await PlayQ(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 547, in __call__
+    return await self.callback(context, *args, **kwargs)  # type: ignore
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 186, in PlayQ
+    if vc is None:
+UnboundLocalError: local variable 'vc' referenced before assignment
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: UnboundLocalError: local variable 'vc' referenced before assignment
+[2022-11-01 18:07:02] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:07:03] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:07:03] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:07:03] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:07:04] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: a02953cb16e9e8a6548f5a701bb64151).
+[2022-11-01 18:07:10] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:07:10] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:07:10] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:07:10] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 176, in PlayEnqueue
+    await PlayQ(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 547, in __call__
+    return await self.callback(context, *args, **kwargs)  # type: ignore
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 191, in PlayQ
+    player.start()
+AttributeError: 'NoneType' object has no attribute 'start'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'start'
+[2022-11-01 18:07:32] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:07:32] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 18:07:32] [INFO    ] discord.player: ffmpeg process 16344 has not terminated. Waiting to terminate...
+[2022-11-01 18:07:32] [INFO    ] discord.player: ffmpeg process 16344 should have terminated with a return code of 1.
+[2022-11-01 18:08:22] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:08:22] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:08:22] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:08:23] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 8502805f7c1495c84f8f1e26d0e07c1f).
+[2022-11-01 18:08:38] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:08:38] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:08:39] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:08:39] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 174, in PlayEnqueue
+    await PlayQ(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 547, in __call__
+    return await self.callback(context, *args, **kwargs)  # type: ignore
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 186, in PlayQ
+    player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",source=CurrentSongFilePath))
+AttributeError: 'VoiceChannel' object has no attribute 'play'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'VoiceChannel' object has no attribute 'play'
+[2022-11-01 18:10:01] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:10:01] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 18:10:07] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:10:07] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:10:07] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:10:27] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:10:30] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:10:30] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:10:30] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:10:30] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: da2a583202f4dcb7db6903a5ac4a9737).
+[2022-11-01 18:10:36] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:10:36] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:10:36] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:10:37] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command Play
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 176, in PlayEnqueue
+    await PlayQ(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 547, in __call__
+    return await self.callback(context, *args, **kwargs)  # type: ignore
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 189, in PlayQ
+    player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",source=CurrentSongFilePath))
+AttributeError: 'VoiceChannel' object has no attribute 'play'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'VoiceChannel' object has no attribute 'play'
+[2022-11-01 18:11:30] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:11:30] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 18:11:34] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:11:34] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:11:34] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:11:34] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 110, in play_tune1
+    player.start()
+AttributeError: 'NoneType' object has no attribute 'start'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'start'
+[2022-11-01 18:11:43] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:11:43] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 18:11:43] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-11-01 18:11:43] [INFO    ] discord.player: ffmpeg process 9512 has not terminated. Waiting to terminate...
+[2022-11-01 18:11:43] [INFO    ] discord.player: ffmpeg process 9512 should have terminated with a return code of 1.
+[2022-11-01 18:11:50] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:11:50] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:11:50] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:11:50] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 110, in play_tune1
+    player.start()
+AttributeError: 'NoneType' object has no attribute 'start'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'start'
+[2022-11-01 18:12:59] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:12:59] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-11-01 18:12:59] [INFO    ] discord.player: ffmpeg process 1584 has not terminated. Waiting to terminate...
+[2022-11-01 18:12:59] [INFO    ] discord.player: ffmpeg process 1584 should have terminated with a return code of 1.
+[2022-11-01 18:13:10] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-01 18:13:10] [DEBUG   ] discord.client: on_message has successfully been registered as an event
+[2022-11-01 18:13:10] [INFO    ] discord.client: logging in using static token
+[2022-11-01 18:13:11] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 645573a7bd326d55b82250b6fcb7cb36).
+[2022-11-01 18:13:15] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-01 18:13:15] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-01 18:13:15] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark700.discord.media
+[2022-11-01 18:13:15] [ERROR   ] discord.ext.commands.bot: Ignoring exception in command PlayTune1
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 190, in wrapped
+    ret = await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 110, in play_tune1
+    player.start()
+AttributeError: 'NoneType' object has no attribute 'start'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\bot.py", line 1347, in invoke
+    await ctx.command.invoke(ctx)
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 986, in invoke
+    await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\ext\commands\core.py", line 199, in wrapped
+    raise CommandInvokeError(exc) from exc
+discord.ext.commands.errors.CommandInvokeError: Command raised an exception: AttributeError: 'NoneType' object has no attribute 'start'
+[2022-11-01 18:13:19] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-01 18:13:19] [ERROR   ] discord.player: Calling the after function failed.
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\player.py", line 711, in _call_after
+    self.after(error)
+TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+[2022-11-01 18:13:19] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-01 18:13:19] [INFO    ] discord.player: ffmpeg process 16284 has not terminated. Waiting to terminate...
+[2022-11-01 18:13:19] [INFO    ] discord.player: ffmpeg process 16284 should have terminated with a return code of 1.
+[2022-11-01 18:45:56] [INFO    ] discord.gateway: Shard ID None session has been invalidated.
+[2022-11-01 18:46:02] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 631cd41406ccec07cf0021f0f5424628).
+[2022-11-01 19:53:39] [INFO    ] discord.gateway: Shard ID None session has been invalidated.
+[2022-11-01 19:53:45] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 151a26aab3794ab7b40d8fed10c5c5a2).
