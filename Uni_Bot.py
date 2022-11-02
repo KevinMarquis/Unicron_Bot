@@ -8,6 +8,7 @@ import asyncio
 import os
 from VidDownloader import download
 import queue
+import Token
 
 """ERROR LOGGING"""
 logger = logging.getLogger('discord')
@@ -30,7 +31,7 @@ logger.addHandler(handler)
 ###VARIABLE INITIALIZATION###
 intents = discord.Intents.all()
 # intents.message_content = True
-token = 'MTAzNTM2MjQyOTc1ODA4MzA3Mg.G8JInH.FwQS46hqeYwMkl28qWOzKgWsY66n_elx-W1Xpg'
+token = Token.HiddenToken
 default_prefix = "!"
 prefix = default_prefix  # We will keep prefix/user data as instance data for now - this will be changed to be per server
 bot = commands.Bot(command_prefix='$', intents=intents)
