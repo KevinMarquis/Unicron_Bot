@@ -1887,3 +1887,4 @@ TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was
 [2022-11-01 18:46:02] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 631cd41406ccec07cf0021f0f5424628).
 [2022-11-01 19:53:39] [INFO    ] discord.gateway: Shard ID None session has been invalidated.
 [2022-11-01 19:53:45] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 151a26aab3794ab7b40d8fed10c5c5a2).
+[2022-11-01 21:21:03] [INFO    ] discord.gateway: Shard ID None session has been invalidated.
