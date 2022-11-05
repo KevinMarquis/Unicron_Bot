@@ -27,8 +27,8 @@ def download(url):
     suffix = ""
     i = 1
     while os.path.exists(base + suffix + extension):
-        suffix += str(i)
         i += 1
+        suffix = str(i)
     new_file = base + suffix + extension
 
     os.rename(out_file, new_file)

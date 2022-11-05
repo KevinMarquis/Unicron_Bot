@@ -9,6 +9,7 @@ import os
 from VidDownloader import download
 import queue
 import Token
+from discord.utils import get
 
 """ERROR LOGGING"""
 logger = logging.getLogger('discord')
@@ -63,8 +64,6 @@ async def on_message(message):
 
 
 """FUNCTIONS"""
-
-
 class MyHelpCommand(commands.MinimalHelpCommand):
     async def send_pages(self):
         destination = self.get_destination()
@@ -103,6 +102,7 @@ async def pref_change(ctx, new_pref):
 @bot.command(name="PlayTune1")
 async def play_tune1(ctx):
     """Plays a preset tune.  TESTING FUNCTION."""
+    global vc
     successful_join = join(ctx)
     if successful_join:  # Only proceed with music if user is actually in vc
         channel = ctx.author.voice.channel  # Note the channel to play music in
@@ -124,10 +124,13 @@ async def join(ctx):
         if not successful_join:
             vc = await channel.connect()
             successful_join = True
-        return True
     except:
         await ctx.send("User must be in a voice channel")
-        return True
+
+    if vc is None or not vc.is_connected():
+        await ctx.author.voice.channel.connect()
+        vc = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    return vc
 
 @bot.command(name="Leave")
 async def leave(ctx):
@@ -137,6 +140,7 @@ async def leave(ctx):
     successful_join = False
     vc = None
     #TODO: Add case for deleting music file after leave
+
 file_path = os.path.realpath(__file__)
 
 @bot.command(name="DownloadAudio")
@@ -164,37 +168,70 @@ async def PlayYT(ctx, url):
 
 @bot.command(name="Play")
 async def PlayEnqueue(ctx, url):
+    global playingNOW
+    global MusicQueue
     file = download(url)
     global successful_join
-    global vc
-    await join(ctx)
     if successful_join:  # Only proceed with music if user is actually in vc
-        global MusicQueue
         MusicQueue.put((ctx, file))
     else:
-        await ctx.send("User is not in a voice channel.")
+        #await ctx.send("User is not in a voice channel.")
+        VChan = await join(ctx)
+        MusicQueue.put((ctx, file))
     if not playingNOW:
-        await PlayQ(ctx)
+        await PlayQ(ctx, VChan)
 
 
 @bot.command(name="PlayQueue")
-async def PlayQ(ctx):
+async def PlayQ(ctx, voice):
     global playingNOW
     global vc
+    event = asyncio.Event()
+    event.set()
     playingNOW = True
+    print("entering PlayQ")
+    print(MusicQueue.qsize())  #TODO Things are not getting enqueued properly
     while not MusicQueue.empty():
+        await event.wait()
+        event.clear()
+
         print("PLAY SONG NOW")
         Current = MusicQueue.get()
-        vc = Current[0].author.voice.channel
         CurrentSongFilePath = Current[1]
-        player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",source=CurrentSongFilePath))
-        player.start()
-        while not player.is_done():
+        voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",source=CurrentSongFilePath), after=lambda e: event.set())
+        await ctx.send("NOW PLAYING: " + CurrentSongFilePath)
+        #player.start()
+        #while not player.is_done():
+         #   await asyncio.sleep(1)
+        #player.stop()
+        while voice.is_playing():
             await asyncio.sleep(1)
-        player.stop()
         print(Current[1])
         os.remove(CurrentSongFilePath)
 
+'''
+async def play_song(ctx, voice):
+    global stop_playing, pos_in_q, time_from_song
+    event = asyncio.Event()
+    event.set()
+    while True:
+        await event.wait()
+        event.clear()
+        if len(queue) == pos_in_q - 1:
+            await ctx.send('Party is over! use the `.arse-play` to play again.')
+            print('Party is over!')
+            create_queue()
+            break
+        if stop_playing is True:
+            stop_playing = False
+            break
+
+        song_ = queue[pos_in_q][len('songs/'):]
+        voice.play(discord.FFmpegPCMAudio(queue[pos_in_q]), after=lambda e: event.set())
+        print(f'Now playing {song_}')
+        time_from_song = time.time()
+        pos_in_q += 1
+'''
 """STARTUP"""
 # Assume client refers to a discord.Client subclass...
 # Suppress the default configuration since we have our own
