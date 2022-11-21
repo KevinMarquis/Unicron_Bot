@@ -37,7 +37,8 @@ def download(url):
     print(yt.title + " has been successfully downloaded.")
     print(base)
     filepath = os.path.join(destination, yt.title + suffix + extension)
-    return filepath
+    VideoName = base[len(path) + 1:]
+    return (filepath, VideoName)
 
 
 if __name__ == "__main__":

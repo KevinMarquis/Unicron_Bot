@@ -168,16 +168,22 @@ async def PlayYT(ctx, url):
 
 @bot.command(name="Play")
 async def PlayEnqueue(ctx, url):
+    #TODO : Address if already connected to voice channel
     global playingNOW
     global MusicQueue
-    file = download(url)
+    #file = download(url)
     global successful_join
     if successful_join:  # Only proceed with music if user is actually in vc
-        MusicQueue.put((ctx, file))
+        MusicQueue.put((ctx, url))
+        await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
+        print("Enqueued: at position " + str(MusicQueue.qsize()))
+        VChan = ctx.voice_client.channel
     else:
         #await ctx.send("User is not in a voice channel.")
         VChan = await join(ctx)
-        MusicQueue.put((ctx, file))
+        MusicQueue.put((ctx, url))
+        await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
+        print("Enqueued: at position " + str(MusicQueue.qsize()))
     if not playingNOW:
         await PlayQ(ctx, VChan)
 
@@ -186,28 +192,46 @@ async def PlayEnqueue(ctx, url):
 async def PlayQ(ctx, voice):
     global playingNOW
     global vc
+    global successful_join
     event = asyncio.Event()
     event.set()
     playingNOW = True
     print("entering PlayQ")
-    print(MusicQueue.qsize())  #TODO Things are not getting enqueued properly
-    while not MusicQueue.empty():
+    #while not MusicQueue.empty():
+    previousFilePath = ""
+    while True:
+        print(MusicQueue.qsize())  # TODO Things are not getting enqueued properly
         await event.wait()
+        if len(previousFilePath) > 0:
+            os.remove(previousFilePath)
+            print("Removed.")
         event.clear()
+        if MusicQueue.qsize() == 0:
+            playingNOW = False
+            await ctx.voice_client.disconnect()
+            successful_join = False
+            break
 
         print("PLAY SONG NOW")
         Current = MusicQueue.get()
-        CurrentSongFilePath = Current[1]
-        voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",source=CurrentSongFilePath), after=lambda e: event.set())
-        await ctx.send("NOW PLAYING: " + CurrentSongFilePath)
+        file = download(Current[1])
+        CurrentSongFilePath = file[0]
+        #voice.play(self.queue[i], after=lambda e: print('Player error: %s' % e) if e else None)
+        voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: event.set())
+        await ctx.send("NOW PLAYING: " + file[1])
+        print("NOW PLAYING: " + file[1])
         #player.start()
         #while not player.is_done():
          #   await asyncio.sleep(1)
         #player.stop()
-        while voice.is_playing():
-            await asyncio.sleep(1)
-        print(Current[1])
-        os.remove(CurrentSongFilePath)
+        #while voice.is_playing():
+        #    await asyncio.sleep(1)
+        await ctx.send("Finished Playing " + file[1] + " Deleting file and moving to next song:")
+        print("Finished Playing " + file[1] + " Deleting file and moving to next song:")
+        previousFilePath = CurrentSongFilePath
+        #os.remove(CurrentSongFilePath)
+    #await leave(ctx)
+
 
 '''
 async def play_song(ctx, voice):
