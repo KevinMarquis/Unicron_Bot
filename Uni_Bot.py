@@ -67,16 +67,15 @@ async def on_voice_state_update(user, before, after):
                vc.pause()  # Pauses music if any is playing currently.
 
             HeraldVC = await channel.connect()
-            HeraldVC.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=HeraldSongs[user.id][1]), after=lambda e: print("Done playing for user."))
-            while not player.is_done():
+            HeraldVC.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=HeraldSongs[user.id][1]), after=lambda e: print("Done playing for user " + user.name + "."))
+
+            while HeraldVC.is_playing():  # Sleep while the video finishes up playing.
                 await asyncio.sleep(1)
-            player.stop()
 
             if playingNOW:
                 vc.resume()  # resumes music if any was playing.
             else:
-                await channel.disconnect()
-
+                await HeraldVC.disconnect()
 
 
 
@@ -128,6 +127,7 @@ async def pref_change(ctx, new_pref):
     bot.command_prefix = prefix
     await ctx.send("Prefix has been set to: " + prefix)
 
+'''  Commented out since this is no longer necessary.
 @bot.command(name="PlayTune1")
 async def play_tune1(ctx):
     """Plays a preset tune.  TESTING FUNCTION."""
@@ -143,6 +143,7 @@ async def play_tune1(ctx):
         player.stop()
     else:
         await ctx.send("User is not in a voice channel.")
+'''
 
 @bot.command(name="Join")
 async def join(ctx):
@@ -173,13 +174,14 @@ async def leave(ctx):
     #TODO: Add case for deleting music file after leave
 
 file_path = os.path.realpath(__file__)
-
+'''Commenting out sincw we don't want users to have access to this.  Just for testing.
 @bot.command(name="DownloadAudio")
 async def dl(ctx, url):
     """Testing command.  Downloads a youtube video as an mp3."""
     download(url)
+'''
 
-
+'''Replaced by PlayEnqueue and PlayQ.  This was for testing.
 @bot.command(name="PlayNOW")
 async def PlayYT(ctx, url):
     """Testing function/command.  Plays a single video.  This command will be removed at release."""
@@ -197,7 +199,7 @@ async def PlayYT(ctx, url):
     else:
         await ctx.send("User is not in a voice channel.")
 
-    #TODO: Implement herald bot functionality
+'''
 
 @bot.command(name="Play")
 async def PlayEnqueue(ctx, url):
@@ -266,7 +268,7 @@ async def PlayQ(ctx, voice):
         # Send out status messages.
         await ctx.send("NOW PLAYING: " + file[1])  # file
         print("NOW PLAYING: " + file[1])
-        await ctx.send("Finished Playing " + file[1] + " Deleting file and moving to next song:")
+        #await ctx.send("Finished Playing " + file[1] + " Deleting file and moving to next song:")  # We don't need to print tis in chat.  Printing in the log should be enough.
         print("Finished Playing " + file[1] + " Deleting file and moving to next song:")
         previousFilePath = CurrentSongFilePath
 
@@ -280,7 +282,12 @@ async def HeraldSet(ctx, url):
     HeraldUser = ctx.author
     HeraldKey = HeraldUser.id  # Takes the user's id.  This will be used as the key for the dictionary.
 
-    file = downloadHERALD(url)  # Returns tuple containing the filepath and file name
+    try:
+        file = downloadHERALD(url)  # Returns tuple containing the filepath and file name
+    except:
+        await ctx.send("ERROR: Herald Theme download failed.")
+        print("ERROR: Herald Theme download failed.")
+
     HeraldSongs[HeraldKey] = (url, file[0], file[1])  # Stores the file as a tuple: URL (backup), filepath, file name.
 
     userMentionTag = HeraldUser.mention
@@ -290,18 +297,18 @@ async def HeraldSet(ctx, url):
 async def HeraldTheme(ctx):
     """Returns the user's Herald Theme if one is set."""
     global HeraldSongs
+    try:
+        HeraldID = ctx.author.id
+        userMentionTag = ctx.author.mention
+        if HeraldID in HeraldSongs.keys():
+            await ctx.send(userMentionTag + "Your Herald theme is: " + HeraldSongs[HeraldID][2] + ", LINK: " + HeraldSongs[HeraldID][0])
 
-    HeraldID = ctx.author.id
-    userMentionTag = ctx.author.mention
-    if HeraldID in HeraldSongs.keys():
-        await ctx.send(userMentionTag + "Your Herald theme is: " + HeraldSongs[HeraldID][2] + ", LINK: " + HeraldSongs[HeraldID][0])
+        else:
+            await ctx.send(userMentionTag + "You do not have a Herald theme set.  To set one use the HeraldSet command, along with a link to a short youtube video.")
 
-    else:
-        await ctx.send(userMentionTag + "You do not have a Herald theme set.  To set one use the HeraldSet command, along with a link to a short youtube video.")
-
-
-#TODO: Known issue, where audio is not actually playing/audible.
-
+    except:
+        await ctx.send("ERROR: HERALD THEME CHECK FAILED.")
+        print("ERROR: HERALD THEME CHECK FAILED.")
 
 
 """STARTUP"""

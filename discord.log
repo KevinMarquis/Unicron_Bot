@@ -8636,3 +8636,255 @@ TypeError: play_tune1.<locals>.<lambda>() takes 0 positional arguments but 1 was
 [2022-11-21 22:36:19] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
 [2022-11-21 22:36:19] [INFO    ] discord.player: ffmpeg process 6260 has not terminated. Waiting to terminate...
 [2022-11-21 22:36:19] [INFO    ] discord.player: ffmpeg process 6260 should have terminated with a return code of 1.
+[2022-11-22 07:42:51] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:42:51] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:42:51] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:42:52] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 8c1fa65ed87c05fd395bef28a6eecf8c).
+[2022-11-22 07:44:04] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:44:04] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:44:04] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark6013.discord.media
+[2022-11-22 07:44:11] [INFO    ] discord.player: ffmpeg process 22256 successfully terminated with return code of 0.
+[2022-11-22 07:44:11] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:44:11] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:44:46] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:44:46] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:44:46] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1244.discord.media
+[2022-11-22 07:44:46] [ERROR   ] discord.state: Exception occurred during Voice Protocol voice server update handler
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\state.py", line 157, in logging_coroutine
+    await coroutine
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 337, in on_voice_server_update
+    await self.ws.close(4000)
+AttributeError: '_MissingSentinel' object has no attribute 'close'
+[2022-11-22 07:44:46] [ERROR   ] discord.client: Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 71, in on_voice_state_update
+    while not player.is_done():
+NameError: name 'player' is not defined
+[2022-11-22 07:44:51] [INFO    ] discord.player: ffmpeg process 1912 successfully terminated with return code of 0.
+[2022-11-22 07:45:41] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:45:41] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:45:45] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:45:45] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:45:45] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark435.discord.media
+[2022-11-22 07:45:45] [ERROR   ] discord.state: Exception occurred during Voice Protocol voice server update handler
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\state.py", line 157, in logging_coroutine
+    await coroutine
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 337, in on_voice_server_update
+    await self.ws.close(4000)
+AttributeError: '_MissingSentinel' object has no attribute 'close'
+[2022-11-22 07:45:45] [ERROR   ] discord.client: Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 71, in on_voice_state_update
+    while not player.is_done():
+NameError: name 'player' is not defined
+[2022-11-22 07:45:50] [INFO    ] discord.player: ffmpeg process 14192 successfully terminated with return code of 0.
+[2022-11-22 07:46:44] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:46:46] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:46:46] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:46:46] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:46:47] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 91a968092e4676883ce68155a2027b53).
+[2022-11-22 07:46:58] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:46:58] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:46:58] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark2112.discord.media
+[2022-11-22 07:46:58] [ERROR   ] discord.client: Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 78, in on_voice_state_update
+    await channel.disconnect()
+AttributeError: 'VoiceChannel' object has no attribute 'disconnect'
+[2022-11-22 07:47:03] [INFO    ] discord.player: ffmpeg process 756 successfully terminated with return code of 0.
+[2022-11-22 07:48:14] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:48:16] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:48:16] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:48:16] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:48:17] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 596155e99c073eed3e67cf5d6a0f1465).
+[2022-11-22 07:48:26] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:48:26] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:48:26] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark8801.discord.media
+[2022-11-22 07:48:26] [ERROR   ] discord.client: Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 79, in on_voice_state_update
+    await channel.voice_client.disconnect()
+AttributeError: 'VoiceChannel' object has no attribute 'voice_client'
+[2022-11-22 07:48:31] [INFO    ] discord.player: ffmpeg process 20436 successfully terminated with return code of 0.
+[2022-11-22 07:49:10] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:49:12] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:49:12] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:49:12] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:49:13] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 93e0e160c47c57be19925c870f856b86).
+[2022-11-22 07:49:27] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:49:27] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:49:27] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1916.discord.media
+[2022-11-22 07:49:27] [ERROR   ] discord.state: Exception occurred during Voice Protocol voice server update handler
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\state.py", line 157, in logging_coroutine
+    await coroutine
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 337, in on_voice_server_update
+    await self.ws.close(4000)
+AttributeError: '_MissingSentinel' object has no attribute 'close'
+[2022-11-22 07:49:27] [ERROR   ] discord.client: Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 79, in on_voice_state_update
+    await bot.voice_clients.disconnect()
+AttributeError: 'list' object has no attribute 'disconnect'
+[2022-11-22 07:49:32] [INFO    ] discord.player: ffmpeg process 12648 successfully terminated with return code of 0.
+[2022-11-22 07:50:15] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:50:17] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:50:17] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:50:17] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:50:18] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: e87916f2eddfe8fad258b73cfab8e482).
+[2022-11-22 07:50:30] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:50:30] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:50:30] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1803.discord.media
+[2022-11-22 07:50:30] [INFO    ] discord.player: ffmpeg process 19724 has not terminated. Waiting to terminate...
+[2022-11-22 07:50:30] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:50:30] [INFO    ] discord.player: ffmpeg process 19724 should have terminated with a return code of 1.
+[2022-11-22 07:50:30] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:51:19] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:51:19] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:51:19] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:51:20] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: bd91ecd279331a0da8e918f12e4bb04b).
+[2022-11-22 07:51:32] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:51:32] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:51:32] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7607.discord.media
+[2022-11-22 07:51:33] [ERROR   ] discord.client: Ignoring exception in on_voice_state_update
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "D:\kevin\Git Repos\Unicron_Bot\Uni_Bot.py", line 71, in on_voice_state_update
+    while not HeraldVC.is_done():
+AttributeError: 'VoiceClient' object has no attribute 'is_done'
+[2022-11-22 07:51:38] [INFO    ] discord.player: ffmpeg process 13600 successfully terminated with return code of 0.
+[2022-11-22 07:53:49] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:53:51] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:53:51] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:53:51] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:53:52] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: c0b3f484858989d1c5c399db31396f67).
+[2022-11-22 07:54:02] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:54:02] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:54:02] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1244.discord.media
+[2022-11-22 07:54:02] [ERROR   ] discord.state: Exception occurred during Voice Protocol voice server update handler
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\state.py", line 157, in logging_coroutine
+    await coroutine
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 337, in on_voice_server_update
+    await self.ws.close(4000)
+AttributeError: '_MissingSentinel' object has no attribute 'close'
+[2022-11-22 07:54:02] [INFO    ] discord.player: ffmpeg process 11012 has not terminated. Waiting to terminate...
+[2022-11-22 07:54:02] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:54:02] [INFO    ] discord.player: ffmpeg process 11012 should have terminated with a return code of 1.
+[2022-11-22 07:54:02] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:54:41] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:54:41] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:54:41] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:54:42] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 73e6db86b8ea508a4e69a4e0223f0ac6).
+[2022-11-22 07:54:57] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:54:57] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:54:57] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark9960.discord.media
+[2022-11-22 07:55:02] [INFO    ] discord.player: ffmpeg process 15456 successfully terminated with return code of 0.
+[2022-11-22 07:55:50] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:55:52] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:55:52] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:55:52] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:55:53] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 4d24ae60de577cb52de9608b54c47d43).
+[2022-11-22 07:56:05] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:56:05] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:56:05] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark7948.discord.media
+[2022-11-22 07:56:07] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:56:07] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:56:07] [INFO    ] discord.player: ffmpeg process 14072 has not terminated. Waiting to terminate...
+[2022-11-22 07:56:07] [INFO    ] discord.player: ffmpeg process 14072 should have terminated with a return code of 1.
+[2022-11-22 07:56:22] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:56:22] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:56:22] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:56:22] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: fa89047db5f1906e12d7e7228a29f346).
+[2022-11-22 07:56:29] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:56:29] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:56:29] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:56:30] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 9a0bae483dc1f24582a66c33d4557728).
+[2022-11-22 07:56:44] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:56:44] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:56:44] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1509.discord.media
+[2022-11-22 07:56:44] [ERROR   ] discord.state: Exception occurred during Voice Protocol voice server update handler
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\state.py", line 157, in logging_coroutine
+    await coroutine
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 337, in on_voice_server_update
+    await self.ws.close(4000)
+AttributeError: '_MissingSentinel' object has no attribute 'close'
+[2022-11-22 07:56:47] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:56:47] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:56:47] [INFO    ] discord.player: ffmpeg process 19172 has not terminated. Waiting to terminate...
+[2022-11-22 07:56:47] [INFO    ] discord.player: ffmpeg process 19172 should have terminated with a return code of 1.
+[2022-11-22 07:58:26] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 07:58:26] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 07:58:26] [INFO    ] discord.client: logging in using static token
+[2022-11-22 07:58:27] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 1f66697d04d230448d01a81eda79aaef).
+[2022-11-22 07:58:38] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:58:38] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:58:38] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark9960.discord.media
+[2022-11-22 07:58:43] [INFO    ] discord.player: ffmpeg process 19488 successfully terminated with return code of 0.
+[2022-11-22 07:58:43] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:58:43] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:59:41] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:59:41] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:59:41] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1244.discord.media
+[2022-11-22 07:59:41] [ERROR   ] discord.state: Exception occurred during Voice Protocol voice server update handler
+Traceback (most recent call last):
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\state.py", line 157, in logging_coroutine
+    await coroutine
+  File "C:\Users\kevin\AppData\Local\Programs\Python\Python310\lib\site-packages\discord\voice_client.py", line 337, in on_voice_server_update
+    await self.ws.close(4000)
+AttributeError: '_MissingSentinel' object has no attribute 'close'
+[2022-11-22 07:59:46] [INFO    ] discord.player: ffmpeg process 12036 successfully terminated with return code of 0.
+[2022-11-22 07:59:46] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 07:59:46] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 07:59:57] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 07:59:57] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 07:59:57] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1244.discord.media
+[2022-11-22 08:00:03] [INFO    ] discord.player: ffmpeg process 2580 successfully terminated with return code of 0.
+[2022-11-22 08:00:03] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 08:00:03] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 08:00:16] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 08:00:16] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 08:00:16] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark1509.discord.media
+[2022-11-22 08:00:21] [INFO    ] discord.player: ffmpeg process 20368 successfully terminated with return code of 0.
+[2022-11-22 08:00:21] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 08:00:21] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 08:08:35] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 08:08:35] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 08:08:35] [INFO    ] discord.client: logging in using static token
+[2022-11-22 08:08:35] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: bcbb61bb4c7a057700cd9e79cd6f5649).
+[2022-11-22 08:08:49] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 08:08:49] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 08:08:50] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark9824.discord.media
+[2022-11-22 08:08:54] [INFO    ] discord.player: ffmpeg process 21008 successfully terminated with return code of 0.
+[2022-11-22 08:08:55] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 08:08:55] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 08:08:58] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 08:08:58] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 08:08:58] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark9028.discord.media
+[2022-11-22 08:09:03] [INFO    ] discord.player: ffmpeg process 20348 successfully terminated with return code of 0.
+[2022-11-22 08:09:04] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 08:09:04] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
+[2022-11-22 08:09:51] [DEBUG   ] discord.client: on_ready has successfully been registered as an event
+[2022-11-22 08:09:51] [DEBUG   ] discord.client: on_voice_state_update has successfully been registered as an event
+[2022-11-22 08:09:51] [INFO    ] discord.client: logging in using static token
+[2022-11-22 08:09:51] [INFO    ] discord.gateway: Shard ID None has connected to Gateway (Session ID: 304fb3b08f28870c23d4548d3e7eb387).
+[2022-11-22 08:10:00] [INFO    ] discord.voice_client: Connecting to voice...
+[2022-11-22 08:10:00] [INFO    ] discord.voice_client: Starting voice handshake... (connection attempt 1)
+[2022-11-22 08:10:00] [INFO    ] discord.voice_client: Voice handshake complete. Endpoint found newark9028.discord.media
+[2022-11-22 08:10:05] [INFO    ] discord.player: ffmpeg process 23536 successfully terminated with return code of 0.
+[2022-11-22 08:10:05] [INFO    ] discord.voice_client: The voice handshake is being terminated for Channel ID 649021537290027008 (Guild ID 649021537285832745)
+[2022-11-22 08:10:05] [INFO    ] discord.voice_client: Disconnecting from voice normally, close code 1000.
