@@ -6,7 +6,7 @@ from discord import FFmpegPCMAudio
 from discord import FFmpegAudio
 import asyncio
 import os
-from VidDownloader import download
+from VidDownloader import download, downloadHERALD
 import queue
 import Token
 from discord.utils import get
@@ -32,27 +32,56 @@ logger.addHandler(handler)
 ###VARIABLE INITIALIZATION###
 intents = discord.Intents.all()
 # intents.message_content = True
-token = Token.HiddenToken
-default_prefix = "!"
+token = Token.HiddenToken  # Pull the token from another file.
+default_prefix = "!"  # Sets the default prefix for the bot.  This can be changed with a command.
 prefix = default_prefix  # We will keep prefix/user data as instance data for now - this will be changed to be per server
 bot = commands.Bot(command_prefix='$', intents=intents)
 
-intents = discord.Intents.default()
+intents = discord.Intents.default()  # Set bot permissions.
 intents.message_content = True
 
 client = discord.Client(intents=intents)
 
+# Initialize global variables
 MusicQueue = queue.Queue()
 successful_join = False
 vc = None
 playingNOW = False
+HeraldSongs = dict()  # Initialize a dictionary for Herald profiles
 
+'''EVENTS'''
 @bot.event
 async def on_ready():
+    """Debug Event: Triggers when bot is online."""
     print(f'We have logged in as {bot.user}')
 
+@bot.event
+async def on_voice_state_update(user, before, after):
+    if before.channel is None and after.channel:
+       # User has connected to a VoiceChannel
+        channel = after.channel
 
-# - May not need this
+        if user.id in HeraldSongs.keys():
+            channel = user.voice.channel  # Note the channel to play music in
+            if playingNOW:
+               vc.pause()  # Pauses music if any is playing currently.
+
+            HeraldVC = await channel.connect()
+            HeraldVC.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=HeraldSongs[user.id][1]), after=lambda e: print("Done playing for user."))
+            while not player.is_done():
+                await asyncio.sleep(1)
+            player.stop()
+
+            if playingNOW:
+                vc.resume()  # resumes music if any was playing.
+            else:
+                await channel.disconnect()
+
+
+
+
+'''
+Example code for an event
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -61,7 +90,7 @@ async def on_message(message):
     if message.content.startswith('&&&hello'):
         await message.channel.send('Hello!')
     await bot.process_commands(message)
-
+'''
 
 """FUNCTIONS"""
 class MyHelpCommand(commands.MinimalHelpCommand):
@@ -117,6 +146,7 @@ async def play_tune1(ctx):
 
 @bot.command(name="Join")
 async def join(ctx):
+    """Bot joins the voice channel."""
     global successful_join
     global vc
     try:  #Checks if user is in a voice channel
@@ -134,6 +164,7 @@ async def join(ctx):
 
 @bot.command(name="Leave")
 async def leave(ctx):
+    """Bot leaves the voice channel."""
     global successful_join
     global vc
     await ctx.voice_client.disconnect()
@@ -145,11 +176,13 @@ file_path = os.path.realpath(__file__)
 
 @bot.command(name="DownloadAudio")
 async def dl(ctx, url):
+    """Testing command.  Downloads a youtube video as an mp3."""
     download(url)
 
 
 @bot.command(name="PlayNOW")
 async def PlayYT(ctx, url):
+    """Testing function/command.  Plays a single video.  This command will be removed at release."""
     file = download(url)
     successful_join = join(ctx)
     if successful_join:  # Only proceed with music if user is actually in vc
@@ -168,94 +201,109 @@ async def PlayYT(ctx, url):
 
 @bot.command(name="Play")
 async def PlayEnqueue(ctx, url):
-    #TODO : Address if already connected to voice channel
+    """Command that user interacts with.  Adds urls to a music queue which are popped and played by PlayQ"""
+    # Initialize global variables
     global playingNOW
     global MusicQueue
-    #file = download(url)
     global successful_join
-    if successful_join:  # Only proceed with music if user is actually in vc
-        MusicQueue.put((ctx, url))
-        await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
-        print("Enqueued: at position " + str(MusicQueue.qsize()))
-        VChan = ctx.voice_client.channel
-    else:
-        #await ctx.send("User is not in a voice channel.")
-        VChan = await join(ctx)
-        MusicQueue.put((ctx, url))
-        await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
-        print("Enqueued: at position " + str(MusicQueue.qsize()))
-    if not playingNOW:
-        await PlayQ(ctx, VChan)
+    try:
+        UserVoiceChannel = ctx.author.voice.channel  # Looks up the user channel.  If this fails (except), then we throw out the command since the user is not in voice.
+        if successful_join:  # Execution will depend on whether the bot is already in the voice channel
+            MusicQueue.put((ctx, url))  # Add song to queue
+            await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
+            print("Enqueued: at position " + str(MusicQueue.qsize()))
+            VChan = ctx.voice_client.channel
+        else:
+            VChan = await join(ctx)
+            MusicQueue.put((ctx, url))
+            await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
+            print("Enqueued: at position " + str(MusicQueue.qsize()))
+        if not playingNOW:
+            await PlayQ(ctx, VChan)
+    except:
+        await ctx.send("ERROR: User must be in voice channel to issue music commands.")
+        print("Command thrown out.  User not in voice chat.")
 
 
 @bot.command(name="PlayQueue")
 async def PlayQ(ctx, voice):
+    """Command used to play the queue of songs/videos enqueued with PlayEnqueue."""
+    # Global variable declarations
     global playingNOW
     global vc
     global successful_join
+
+    # Sets up an asynchronous event.
     event = asyncio.Event()
     event.set()
-    playingNOW = True
+    playingNOW = True  # Initializes playing flag as true.
     print("entering PlayQ")
-    #while not MusicQueue.empty():
     previousFilePath = ""
-    while True:
-        print(MusicQueue.qsize())  # TODO Things are not getting enqueued properly
-        await event.wait()
-        if len(previousFilePath) > 0:
+    while True:  # Loops forever until we break (when queue is empty)
+        print(MusicQueue.qsize())
+        await event.wait()  # Wait until the previous song is done playing.
+
+        if len(previousFilePath) > 0: # If we have a previous file path (a song was played before this) delete the file.
             os.remove(previousFilePath)
             print("Removed.")
-        event.clear()
-        if MusicQueue.qsize() == 0:
+
+        event.clear()  # Reset the event
+
+        if MusicQueue.qsize() == 0:  # Check if the queue is empty
             playingNOW = False
-            await ctx.voice_client.disconnect()
+            await ctx.voice_client.disconnect()  # If queue is empty, we disconnect from voice.
             successful_join = False
             break
 
         print("PLAY SONG NOW")
-        Current = MusicQueue.get()
-        file = download(Current[1])
-        CurrentSongFilePath = file[0]
-        #voice.play(self.queue[i], after=lambda e: print('Player error: %s' % e) if e else None)
+        Current = MusicQueue.get()  # Pop a song from the queue
+        file = download(Current[1])  # Download the song that was linked.
+        CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
+
+        # Begin playing the audio file.  Executable will need to be changed when running on server.
         voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: event.set())
-        await ctx.send("NOW PLAYING: " + file[1])
+
+        # Send out status messages.
+        await ctx.send("NOW PLAYING: " + file[1])  # file
         print("NOW PLAYING: " + file[1])
-        #player.start()
-        #while not player.is_done():
-         #   await asyncio.sleep(1)
-        #player.stop()
-        #while voice.is_playing():
-        #    await asyncio.sleep(1)
         await ctx.send("Finished Playing " + file[1] + " Deleting file and moving to next song:")
         print("Finished Playing " + file[1] + " Deleting file and moving to next song:")
         previousFilePath = CurrentSongFilePath
-        #os.remove(CurrentSongFilePath)
-    #await leave(ctx)
 
 
-'''
-async def play_song(ctx, voice):
-    global stop_playing, pos_in_q, time_from_song
-    event = asyncio.Event()
-    event.set()
-    while True:
-        await event.wait()
-        event.clear()
-        if len(queue) == pos_in_q - 1:
-            await ctx.send('Party is over! use the `.arse-play` to play again.')
-            print('Party is over!')
-            create_queue()
-            break
-        if stop_playing is True:
-            stop_playing = False
-            break
+@bot.command(name = "HeraldSet", description = "Sets up a herald bot profile.  Provide a short YouTube URL to play every time you join voice.")
+async def HeraldSet(ctx, url):
+    """Sets the Herald Theme for the user."""
+    # Initialize global variables
+    global HeraldSongs
 
-        song_ = queue[pos_in_q][len('songs/'):]
-        voice.play(discord.FFmpegPCMAudio(queue[pos_in_q]), after=lambda e: event.set())
-        print(f'Now playing {song_}')
-        time_from_song = time.time()
-        pos_in_q += 1
-'''
+    HeraldUser = ctx.author
+    HeraldKey = HeraldUser.id  # Takes the user's id.  This will be used as the key for the dictionary.
+
+    file = downloadHERALD(url)  # Returns tuple containing the filepath and file name
+    HeraldSongs[HeraldKey] = (url, file[0], file[1])  # Stores the file as a tuple: URL (backup), filepath, file name.
+
+    userMentionTag = HeraldUser.mention
+    await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + HeraldSongs[HeraldKey][2])
+
+@bot.command(name = "HeraldTheme", description = "Returns the user's herald theme.")
+async def HeraldTheme(ctx):
+    """Returns the user's Herald Theme if one is set."""
+    global HeraldSongs
+
+    HeraldID = ctx.author.id
+    userMentionTag = ctx.author.mention
+    if HeraldID in HeraldSongs.keys():
+        await ctx.send(userMentionTag + "Your Herald theme is: " + HeraldSongs[HeraldID][2] + ", LINK: " + HeraldSongs[HeraldID][0])
+
+    else:
+        await ctx.send(userMentionTag + "You do not have a Herald theme set.  To set one use the HeraldSet command, along with a link to a short youtube video.")
+
+
+#TODO: Known issue, where audio is not actually playing/audible.
+
+
+
 """STARTUP"""
 # Assume client refers to a discord.Client subclass...
 # Suppress the default configuration since we have our own
