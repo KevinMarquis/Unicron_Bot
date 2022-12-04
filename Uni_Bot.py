@@ -35,7 +35,7 @@ intents = discord.Intents.all()
 token = Token.HiddenToken  # Pull the token from another file.
 default_prefix = "!"  # Sets the default prefix for the bot.  This can be changed with a command.
 prefix = default_prefix  # We will keep prefix/user data as instance data for now - this will be changed to be per server
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix=prefix, intents=intents)
 
 intents = discord.Intents.default()  # Set bot permissions.
 intents.message_content = True
@@ -48,6 +48,8 @@ successful_join = False
 vc = None
 playingNOW = False
 HeraldSongs = dict()  # Initialize a dictionary for Herald profiles
+BreakPlayLoop = False
+PlayingEvent = None
 
 '''EVENTS'''
 @bot.event
@@ -108,7 +110,7 @@ bot.help_command = MyHelpCommand()
 async def hello(ctx):
     await ctx.send(ctx.author.mention + " hello!")
 
-
+'''
 @bot.command(name="test")
 async def test(ctx):
     await ctx.send("Test")
@@ -117,7 +119,7 @@ async def test(ctx):
 @bot.command()
 async def test2(ctx, arg):
     await ctx.send(arg)
-
+'''
 
 @bot.command(name="prefix_change")
 async def pref_change(ctx, new_pref):
@@ -173,7 +175,54 @@ async def leave(ctx):
     vc = None
     #TODO: Add case for deleting music file after leave
 
-file_path = os.path.realpath(__file__)
+
+@bot.command(name="Pause")
+async def pause(ctx):
+    global playingNOW
+    global vc
+    if playingNOW:
+        # Pause audio
+        vc.pause()
+    else:
+        # Don't try to pause if not playing now.  We'll have a null pointer exception.
+        await ctx.send(ctx.author.mention + " No audio playing.  Play something with " + prefix + "Play")
+
+@bot.command(name="Resume")
+async def pause(ctx):
+    global playingNOW
+    global vc
+    if playingNOW:
+        vc.resume()  # resumes music if any was playing.
+    else:
+        await ctx.send(ctx.author.mention + " No audio playing.  Maybe you meant to play something with " + prefix + "Play")
+
+@bot.command(name="Skip")
+async def skip_song(ctx):
+    global playingNOW
+    global BreakPlayLoop
+    global vc
+    global PlayingEvent
+    print("Received Skip Command")
+    if playingNOW:
+        vc.stop()
+    else:
+        await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can skip it!")
+
+
+@bot.command(name="Stop")
+async def stop_playing(ctx):
+    global playingNOW
+    global vc
+    global MusicQueue
+    if playingNOW:
+        MusicQueue = queue.Queue()
+        vc.stop()
+    else:
+        await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can stop it!")
+
+
+
+
 '''Commenting out sincw we don't want users to have access to this.  Just for testing.
 @bot.command(name="DownloadAudio")
 async def dl(ctx, url):
@@ -227,29 +276,42 @@ async def PlayEnqueue(ctx, url):
         print("Command thrown out.  User not in voice chat.")
 
 
-@bot.command(name="PlayQueue")
+#@bot.command(name="PlayQueue")  # Commenting this out in order to make it inaccessible to users.
 async def PlayQ(ctx, voice):
     """Command used to play the queue of songs/videos enqueued with PlayEnqueue."""
     # Global variable declarations
     global playingNOW
     global vc
     global successful_join
+    global BreakPlayLoop
+    global PlayingEvent
 
     # Sets up an asynchronous event.
-    event = asyncio.Event()
-    event.set()
+    #event = asyncio.Event()
+    #event.set()
+    PlayingEvent = asyncio.Event()
+    PlayingEvent.set()
+
     playingNOW = True  # Initializes playing flag as true.
     print("entering PlayQ")
     previousFilePath = ""
     while True:  # Loops forever until we break (when queue is empty)
         print(MusicQueue.qsize())
-        await event.wait()  # Wait until the previous song is done playing.
+        await PlayingEvent.wait()  # Wait until the previous song is done playing.
+
+        if BreakPlayLoop:
+            os.remove(previousFilePath)
+            print("Removed File.")
+            BreakPlayLoop = False
+            break
+
+        print("Testing if this sends when we stop")
 
         if len(previousFilePath) > 0: # If we have a previous file path (a song was played before this) delete the file.
             os.remove(previousFilePath)
-            print("Removed.")
+            print("Removed File.")
 
-        event.clear()  # Reset the event
+        PlayingEvent.clear()  # Reset the event
 
         if MusicQueue.qsize() == 0:  # Check if the queue is empty
             playingNOW = False
@@ -263,7 +325,7 @@ async def PlayQ(ctx, voice):
         CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
 
         # Begin playing the audio file.  Executable will need to be changed when running on server.
-        voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: event.set())
+        voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: PlayingEvent.set())
 
         # Send out status messages.
         await ctx.send("NOW PLAYING: " + file[1])  # file
