@@ -48,7 +48,6 @@ successful_join = False
 vc = None
 playingNOW = False
 HeraldSongs = dict()  # Initialize a dictionary for Herald profiles
-BreakPlayLoop = False
 PlayingEvent = None
 
 '''EVENTS'''
@@ -110,17 +109,6 @@ bot.help_command = MyHelpCommand()
 async def hello(ctx):
     await ctx.send(ctx.author.mention + " hello!")
 
-'''
-@bot.command(name="test")
-async def test(ctx):
-    await ctx.send("Test")
-
-
-@bot.command()
-async def test2(ctx, arg):
-    await ctx.send(arg)
-'''
-
 @bot.command(name="prefix_change")
 async def pref_change(ctx, new_pref):
     """Changes the bot's command prefix to the given parameter"""
@@ -128,24 +116,6 @@ async def pref_change(ctx, new_pref):
     prefix = new_pref  #TODO: The updated prefix is currently stored as instance data...I'd like to change that
     bot.command_prefix = prefix
     await ctx.send("Prefix has been set to: " + prefix)
-
-'''  Commented out since this is no longer necessary.
-@bot.command(name="PlayTune1")
-async def play_tune1(ctx):
-    """Plays a preset tune.  TESTING FUNCTION."""
-    global vc
-    successful_join = join(ctx)
-    if successful_join:  # Only proceed with music if user is actually in vc
-        channel = ctx.author.voice.channel  # Note the channel to play music in
-        vc = await channel.connect()
-        player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source="D:/kevin/Git Repos/Unicron_Bot/TestTune.mp3"), after=lambda: print('done'))
-        player.start()
-        while not player.is_done():
-            await asyncio.sleep(1)
-        player.stop()
-    else:
-        await ctx.send("User is not in a voice channel.")
-'''
 
 @bot.command(name="Join")
 async def join(ctx):
@@ -170,10 +140,16 @@ async def leave(ctx):
     """Bot leaves the voice channel."""
     global successful_join
     global vc
+    global MusicQueue
+
+    if playingNOW:  # Clear the queue out and stop the player.
+        MusicQueue = queue.Queue()
+        vc.stop()
+    # Then we will disconnect.
     await ctx.voice_client.disconnect()
+
     successful_join = False
     vc = None
-    #TODO: Add case for deleting music file after leave
 
 
 @bot.command(name="Pause")
@@ -199,7 +175,6 @@ async def pause(ctx):
 @bot.command(name="Skip")
 async def skip_song(ctx):
     global playingNOW
-    global BreakPlayLoop
     global vc
     global PlayingEvent
     print("Received Skip Command")
@@ -220,35 +195,6 @@ async def stop_playing(ctx):
     else:
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can stop it!")
 
-
-
-
-'''Commenting out sincw we don't want users to have access to this.  Just for testing.
-@bot.command(name="DownloadAudio")
-async def dl(ctx, url):
-    """Testing command.  Downloads a youtube video as an mp3."""
-    download(url)
-'''
-
-'''Replaced by PlayEnqueue and PlayQ.  This was for testing.
-@bot.command(name="PlayNOW")
-async def PlayYT(ctx, url):
-    """Testing function/command.  Plays a single video.  This command will be removed at release."""
-    file = download(url)
-    successful_join = join(ctx)
-    if successful_join:  # Only proceed with music if user is actually in vc
-        channel = ctx.author.voice.channel  # Note the channel to play music in
-        vc = await channel.connect()
-        player = vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source="D:/kevin/Git Repos/Unicron_Bot/"+ file), after=lambda: print('done'))
-        player.start()
-        while not player.is_done():
-            await asyncio.sleep(1)
-        player.stop()
-        os.remove(file)  #TODO: File isn't actually getting deleted
-    else:
-        await ctx.send("User is not in a voice channel.")
-
-'''
 
 @bot.command(name="Play")
 async def PlayEnqueue(ctx, url):
@@ -272,8 +218,8 @@ async def PlayEnqueue(ctx, url):
         if not playingNOW:
             await PlayQ(ctx, VChan)
     except:
-        await ctx.send("ERROR: User must be in voice channel to issue music commands.")
-        print("Command thrown out.  User not in voice chat.")
+        await ctx.send("An exception occurred.  This may be because the user is not in the voice channel.")
+        print("An exception occurred.  This may be because the user is not in the voice channel.")
 
 
 #@bot.command(name="PlayQueue")  # Commenting this out in order to make it inaccessible to users.
@@ -283,12 +229,9 @@ async def PlayQ(ctx, voice):
     global playingNOW
     global vc
     global successful_join
-    global BreakPlayLoop
     global PlayingEvent
 
     # Sets up an asynchronous event.
-    #event = asyncio.Event()
-    #event.set()
     PlayingEvent = asyncio.Event()
     PlayingEvent.set()
 
@@ -298,12 +241,6 @@ async def PlayQ(ctx, voice):
     while True:  # Loops forever until we break (when queue is empty)
         print(MusicQueue.qsize())
         await PlayingEvent.wait()  # Wait until the previous song is done playing.
-
-        if BreakPlayLoop:
-            os.remove(previousFilePath)
-            print("Removed File.")
-            BreakPlayLoop = False
-            break
 
         print("Testing if this sends when we stop")
 
