@@ -35,7 +35,7 @@ intents = discord.Intents.all()
 token = Token.HiddenToken  # Pull the token from another file.
 default_prefix = "!"  # Sets the default prefix for the bot.  This can be changed with a command.
 prefix = default_prefix  # We will keep prefix/user data as instance data for now - this will be changed to be per server
-bot = commands.Bot(command_prefix=prefix, intents=intents)
+bot = commands.Bot(command_prefix=prefix, intents=intents, case_insensitive=True)
 
 intents = discord.Intents.default()  # Set bot permissions.
 intents.message_content = True
