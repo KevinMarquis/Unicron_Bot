@@ -16,7 +16,6 @@ def download(url):
 
     # check for destination to save file
     #print("Enter the destination (leave blank for current directory)")
-    print(path)
     destination = path
 
     # download the file
@@ -30,16 +29,12 @@ def download(url):
     while os.path.exists(path + "\\AUDIO" + suffix + extension):
         i += 1
         suffix = str(i)
-    #TODO: Sanitize strings
-    print(base)
+
     new_file = path + "\\AUDIO" + suffix + extension
-    print(new_file)
     os.rename(out_file, new_file)
 
     # result of success
     print(yt.title + " has been successfully downloaded.")
-    print(base[:len(path)+1])
-    print(base)
     filepath = os.path.join(destination, "AUDIO" + suffix + extension)
     VideoName = base[len(path) + 1:]
     return (filepath, VideoName)
@@ -77,7 +72,6 @@ def downloadHERALD(url):  # Yeah, we reuse a lot of code here, but I don't reall
 
     # result of success
     print(yt.title + " has been successfully downloaded.")
-    print(base)
     filepath = os.path.join(destination, yt.title + suffix + extension)
     VideoName = base[len(path) + 1:]
     return (filepath, VideoName)

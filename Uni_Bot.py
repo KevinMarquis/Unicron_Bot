@@ -208,11 +208,10 @@ async def PlayEnqueue(ctx, url):
         UserVoiceChannel = ctx.author.voice.channel  # Looks up the user channel.  If this fails (except), then we throw out the command since the user is not in voice.
         if successful_join:  # Execution will depend on whether the bot is already in the voice channel
             if "list" in str(url):
-                print("Playlist")
                 p = Playlist(str(url))
+                print("Queueing up a playlist..." + p.title)
                 for vid in p.video_urls:
                     MusicQueue.put((ctx, vid))
-
                     await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
                     print("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
             else:
@@ -223,10 +222,9 @@ async def PlayEnqueue(ctx, url):
             VChan = ctx.voice_client.channel
         else:
             if "list" in str(url):
-                print("Playlist2")
                 p = Playlist(str(url))
+                print("Queueing up a playlist..." + p.title)
                 for vid in p.video_urls:
-                    print("Iterating...")
                     MusicQueue.put((ctx, vid))
                     await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
                     print("Enqueued: " + vid.title + "at position " + str(MusicQueue.qsize()))
@@ -264,8 +262,6 @@ async def PlayQ(ctx, voice):
         print(MusicQueue.qsize())
         await PlayingEvent.wait()  # Wait until the previous song is done playing.
 
-        print("Testing if this sends when we stop")
-
         if len(previousFilePath) > 0: # If we have a previous file path (a song was played before this) delete the file.
             #os.remove(previousFilePath)
             print("Removed File.")
@@ -290,7 +286,6 @@ async def PlayQ(ctx, voice):
         # Send out status messages.
         await ctx.send("NOW PLAYING: " + file[1])  # file
         print("NOW PLAYING: " + file[1])
-        #await ctx.send("Finished Playing " + file[1] + " Deleting file and moving to next song:")  # We don't need to print tis in chat.  Printing in the log should be enough.
         print("Finished Playing " + file[1] + " Deleting file and moving to next song:")
         previousFilePath = CurrentSongFilePath
 
