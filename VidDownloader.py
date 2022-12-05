@@ -30,6 +30,8 @@ def download(url):
     while os.path.exists(base + suffix + extension):
         i += 1
         suffix = str(i)
+    #TODO: Sanitize strings
+    print("base")
     new_file = base + suffix + extension
 
     os.rename(out_file, new_file)

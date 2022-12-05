@@ -4,6 +4,7 @@ import logging.handlers
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 from discord import FFmpegAudio
+from pytube import Playlist, YouTube
 import asyncio
 import os
 from VidDownloader import download, downloadHERALD
@@ -206,15 +207,36 @@ async def PlayEnqueue(ctx, url):
     try:
         UserVoiceChannel = ctx.author.voice.channel  # Looks up the user channel.  If this fails (except), then we throw out the command since the user is not in voice.
         if successful_join:  # Execution will depend on whether the bot is already in the voice channel
-            MusicQueue.put((ctx, url))  # Add song to queue
-            await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
-            print("Enqueued: at position " + str(MusicQueue.qsize()))
+            if "list" in str(url):
+                print("Playlist")
+                p = Playlist(str(url))
+                for vid in p.video_urls:
+                    MusicQueue.put((ctx, vid))
+
+                    await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
+                    print("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
+            else:
+                MusicQueue.put((ctx, url))  # Add song to queue
+                vid = YouTube(str(url))
+                await ctx.send(("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize())))
+                print("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
             VChan = ctx.voice_client.channel
         else:
+            if "list" in str(url):
+                print("Playlist2")
+                p = Playlist(str(url))
+                for vid in p.video_urls:
+                    print("Iterating...")
+                    MusicQueue.put((ctx, vid))
+                    await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
+                    print("Enqueued: " + vid.title + "at position " + str(MusicQueue.qsize()))
+            else:
+                MusicQueue.put((ctx, url))
+                vid = YouTube(str(url))
+                await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
+                print("Enqueued: " + vid.title + "at position " + str(MusicQueue.qsize()))
             VChan = await join(ctx)
-            MusicQueue.put((ctx, url))
-            await ctx.send("Enqueued: at position " + str(MusicQueue.qsize()))
-            print("Enqueued: at position " + str(MusicQueue.qsize()))
+
         if not playingNOW:
             await PlayQ(ctx, VChan)
     except:
@@ -245,7 +267,7 @@ async def PlayQ(ctx, voice):
         print("Testing if this sends when we stop")
 
         if len(previousFilePath) > 0: # If we have a previous file path (a song was played before this) delete the file.
-            os.remove(previousFilePath)
+            #os.remove(previousFilePath)
             print("Removed File.")
 
         PlayingEvent.clear()  # Reset the event
@@ -260,6 +282,7 @@ async def PlayQ(ctx, voice):
         Current = MusicQueue.get()  # Pop a song from the queue
         file = download(Current[1])  # Download the song that was linked.
         CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
+        print(CurrentSongFilePath)
 
         # Begin playing the audio file.  Executable will need to be changed when running on server.
         voice.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: PlayingEvent.set())
