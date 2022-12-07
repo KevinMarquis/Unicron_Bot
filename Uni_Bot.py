@@ -212,34 +212,39 @@ async def PlayEnqueue(ctx, url):
                 print("Queueing up a playlist..." + p.title)
                 for vid in p.video_urls:
                     MusicQueue.put((ctx, vid))
-                    await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
-                    print("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
+                    #await ctx.send("Enqueued: " + str(vid.title) + " at position " + str(MusicQueue.qsize()))
+                    print("Enqueued: " + str(vid.title) + " at position " + str(MusicQueue.qsize()))
+                    #printf
             else:
                 MusicQueue.put((ctx, url))  # Add song to queue
                 vid = YouTube(str(url))
-                await ctx.send(("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize())))
-                print("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
+                await ctx.send(("Enqueued: " + str(vid.title) + " at position " + str(MusicQueue.qsize())))
+                print("Enqueued: " + str(vid.title) + " at position " + str(MusicQueue.qsize()))
             VChan = ctx.voice_client.channel
         else:
             if "list" in str(url):
                 p = Playlist(str(url))
                 print("Queueing up a playlist..." + p.title)
                 for vid in p.video_urls:
+                    print("Attempting to enqueue")
                     MusicQueue.put((ctx, vid))
-                    await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
-                    print("Enqueued: " + vid.title + "at position " + str(MusicQueue.qsize()))
+                    print("Enqueued: " + str(vid.title) + "at position " + str(MusicQueue.qsize()))
+                    #await ctx.send("Enqueued: " + str(vid.title) + " at position " + str(MusicQueue.qsize()))
             else:
                 MusicQueue.put((ctx, url))
                 vid = YouTube(str(url))
-                await ctx.send("Enqueued: " + vid.title + " at position " + str(MusicQueue.qsize()))
-                print("Enqueued: " + vid.title + "at position " + str(MusicQueue.qsize()))
+                await ctx.send("Enqueued: " + str(vid.title) + " at position " + str(MusicQueue.qsize()))
+                print("Enqueued: " + str(vid.title) + "at position " + str(MusicQueue.qsize()))
+                            # Video titles were not necessarily sanitized.  This may fix that issue.
             VChan = await join(ctx)
 
         if not playingNOW:
             await PlayQ(ctx, VChan)
-    except:
+    except Exception as e:
+        print(e)
         await ctx.send("An exception occurred.  This may be because the user is not in the voice channel.")
         print("An exception occurred.  This may be because the user is not in the voice channel.")
+
 
 
 #@bot.command(name="PlayQueue")  # Commenting this out in order to make it inaccessible to users.
