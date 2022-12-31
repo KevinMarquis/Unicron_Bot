@@ -31,15 +31,15 @@ logger.addHandler(handler)
 """SETUP"""
 
 ###VARIABLE INITIALIZATION###
-intents = discord.Intents.all()
-# intents.message_content = True
+intents = discord.Intents.default()  # Set bot permissions.
+intents.message_content = True
+
 token = Token.HiddenToken  # Pull the token from another file.
 default_prefix = "!"  # Sets the default prefix for the bot.  This can be changed with a command.
 prefix = default_prefix  # We will keep prefix/user data as instance data for now - this will be changed to be per server
 bot = commands.Bot(command_prefix=prefix, intents=intents, case_insensitive=True)
 
-intents = discord.Intents.default()  # Set bot permissions.
-intents.message_content = True
+
 
 client = discord.Client(intents=intents)
 
@@ -59,7 +59,7 @@ async def on_ready():
 
 @bot.event
 async def on_voice_state_update(user, before, after):
-    if before.channel is None and after.channel:
+    if before.channel is None and after.channel is not None:
        # User has connected to a VoiceChannel
         channel = after.channel
 
@@ -165,7 +165,7 @@ async def pause(ctx):
         await ctx.send(ctx.author.mention + " No audio playing.  Play something with " + prefix + "Play")
 
 @bot.command(name="Resume")
-async def pause(ctx):
+async def resume(ctx):
     global playingNOW
     global vc
     if playingNOW:

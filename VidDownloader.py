@@ -79,4 +79,7 @@ def downloadHERALD(url):  # Yeah, we reuse a lot of code here, but I don't reall
 
 if __name__ == "__main__":
     Link = str(input("Enter the URL of the video you want to download: \n>> "))
-    download(Link)
+    try:
+        download(Link)
+    except Exception as e:
+        print(e)
