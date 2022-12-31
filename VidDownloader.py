@@ -52,7 +52,6 @@ def downloadHERALD(url):  # Yeah, we reuse a lot of code here, but I don't reall
         os.makedirs(path)
 
     # check for destination to save file
-    #print("Enter the destination (leave blank for current directory)")
     destination = path
 
     # download the file

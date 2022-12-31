@@ -8,6 +8,7 @@ from VidDownloader import download, downloadHERALD
 import queue
 import Token
 import os
+import json
 
 #region ERROR LOGGING
 """ERROR LOGGING"""
@@ -50,6 +51,32 @@ async def on_ready():
         print("This server has ID and Name: ")
         print(guild.id)
         print(guild.name + "\n")
+        BackupFileName = str(guild.id) + ".json"
+        if os.path.exists("HeraldBackups/" + BackupFileName):
+            with open("HeraldBackups/" + BackupFileName, 'r') as backup:
+                ServerProfiles[guild.id].HeraldSongs = json.load(backup)
+                print("Retreived Herald Profiles!")
+
+            print("Restoring Herald Videos!")
+            for userID in ServerProfiles[guild.id].HeraldSongs.keys():
+                HeraldProfile = ServerProfiles[guild.id].HeraldSongs[userID]
+                try:
+                    File = downloadHERALD(HeraldProfile[0])
+                    HeraldProfile[1] = File[0]
+                    HeraldProfile[2] = File[1]
+                except Exception as e:
+                    print("ERROR in Restoring Herald Profile for USER ID: " + userID)
+                    print(e)
+
+            newHeraldProfileDict = {}
+            for OldKey in ServerProfiles[guild.id].HeraldSongs.keys():
+                try:
+                    NewKey = int(OldKey)
+                    newHeraldProfileDict[NewKey] = ServerProfiles[guild.id].HeraldSongs[OldKey]
+                except ValueError:
+                    print("Error in adapting HeraldSongs from JSON.")
+            ServerProfiles[guild.id].HeraldSongs = newHeraldProfileDict
+
     # Add a case for pulling from saved data (i.e. restoring Herald Profiles).  We'll get to that later though.
 
 
@@ -145,12 +172,20 @@ async def HeraldSet(ctx, url):
     userMentionTag = HeraldUser.mention
     await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
 
+    if not os.path.exists("HeraldBackups"):
+        os.makedirs("HeraldBackups")
+    BackupFile = "HeraldBackups/" + str(ThisServerProfile.Guild.id) + ".json"
+    with open(BackupFile, "w") as outfile:
+        json.dump(ThisServerProfile.HeraldSongs, outfile)
+
 @bot.command(name = "HeraldTheme", description = "Returns the user's herald theme.")
 async def HeraldTheme(ctx):
     """Returns the user's Herald Theme if one is set."""
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     try:
+        print(str(ctx.author.id))
+        print(ThisServerProfile.HeraldSongs)
         HeraldID = ctx.author.id
         userMentionTag = ctx.author.mention
         if HeraldID in ThisServerProfile.HeraldSongs.keys():
