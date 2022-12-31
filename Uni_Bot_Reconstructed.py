@@ -264,6 +264,7 @@ async def stop_playing(ctx):
     if ThisServerProfile.playingNOW:
         ThisServerProfile.MusicQueue = queue.Queue()
         ThisServerProfile.vc.stop()
+        ThisServerProfile.playingNOW = False
     else:
         print("Music not playing.  Current queue size: " + str(ThisServerProfile.MusicQueue.qsize()))
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can stop it!")
