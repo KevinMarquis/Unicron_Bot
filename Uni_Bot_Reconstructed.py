@@ -215,6 +215,37 @@ async def pref_change(ctx, new_pref):
 #endregion
 
 #region Voice_Channel_Commands
+@bot.command(name="PlayFromTime")
+async def PlayFromTimestamp(ctx, url, StartTimeStamp, EndTimeStamp):
+    """THIS WILL WORK.  However, we want to integrate this functionality into herald bot and a timeskip command."""
+    global ServerProfiles
+    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+    NumSecondsSTART = int(StartTimeStamp)
+    NumSecondsEND = int(EndTimeStamp)
+    if NumSecondsSTART > 362439 or NumSecondsEND > 362439:   # This is the number of seconds equal to 99:99:99.00 in HH:MM:SS.MS
+        return
+    else:
+        Hours = NumSecondsSTART // 3600
+        Minutes = (NumSecondsSTART % 3600) // 60
+        Seconds = NumSecondsSTART % 60
+        STARTTimestampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
+
+        Hours = NumSecondsEND // 3600
+        Minutes = (NumSecondsEND % 3600) // 60
+        Seconds = NumSecondsEND % 60
+        ENDTimestampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
+
+        File = download(url)
+        await join(ctx)
+        ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=File[0], before_options="-ss " + STARTTimestampCode, options="-ss " + ENDTimestampCode))
+
+
+
+
+
+
+
+
 @bot.command(name="Join")
 async def join(ctx):
     """Bot joins the voice channel."""
