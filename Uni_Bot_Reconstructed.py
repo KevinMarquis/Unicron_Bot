@@ -66,7 +66,7 @@ async def on_ready():
                     HeraldProfile[1] = File[0]
                     HeraldProfile[2] = File[1]
                 except Exception as e:
-                    print("ERROR in Restoring Herald Profile for USER ID: " + userID)
+                    print("ERROR in Restoring Herald Profile for USER ID: ", userID)
                     print(e)
 
             newHeraldProfileDict = {}
@@ -140,17 +140,16 @@ async def on_voice_state_update(user, before, after):
         ThisServerProfile = ServerProfiles[after.channel.guild.id]
 
         if user.id in ThisServerProfile.HeraldSongs.keys():
+            print("Heralding " + user.name)
             channel = user.voice.channel  # Note the channel to play music in
 
             if ThisServerProfile.playingNOW:
                 ThisServerProfile.vc.pause()  # Pauses music if any is playing currently.
 
             HeraldVC = await channel.connect()
-            print(ThisServerProfile.HeraldSongs[user.id][3])
-            print(ThisServerProfile.HeraldSongs[user.id][4])
             HeraldVC.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source= ThisServerProfile.HeraldSongs[user.id][1],  before_options="-ss " + ThisServerProfile.HeraldSongs[user.id][3]), after=lambda e: print("Done playing for user " + user.name + "."))
 
-            start = time.time()
+            start = time.time()  # Check the starttime so we can only play for 15s or less.
             elapsed = 0
             while HeraldVC.is_playing() and elapsed < ThisServerProfile.HeraldSongs[user.id][5]:  # Sleep while the video plays for 15 Seconds
                 elapsed = time.time() - start
@@ -166,6 +165,7 @@ async def on_voice_state_update(user, before, after):
                                                "Provide a url and timestamp (in seconds) and a 15 second clip starting from that timestamp will be saved.")
 async def HeraldSet(ctx, url, StartTime = 0):
     """Sets the Herald Theme for the user."""
+    print("HeraldSet Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     # Initialize global variables
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
@@ -185,12 +185,13 @@ async def HeraldSet(ctx, url, StartTime = 0):
         await ctx.send("ERROR: Herald Theme download failed.")
         print("ERROR: Herald Theme download failed.")
     StartTimeStampCode = CalculateTimeStamp(StartTime)
-    print(StartTimeStampCode)
+    print("Starting Timestamp for user " + HeraldUser.name + ":", StartTimeStampCode)
     EndTimeStampCode = CalculateTimeStamp(EndTime)
-    print(EndTimeStampCode)
+    print("Starting Timestamp for user " + HeraldUser.name + ":", EndTimeStampCode)
     ThisServerProfile.HeraldSongs[HeraldKey] = (url, file[0], file[1], StartTimeStampCode, EndTimeStampCode, EndTime)  # Stores the file as a tuple: URL (backup), filepath, file name, StartTime, EndTime
 
     userMentionTag = HeraldUser.mention
+    print("Success!  Herald theme for " + HeraldUser.name + " has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
     await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
 
     if not os.path.exists("HeraldBackups"):
@@ -202,14 +203,15 @@ async def HeraldSet(ctx, url, StartTime = 0):
 @bot.command(name = "HeraldTheme", description = "Returns the user's herald theme.")
 async def HeraldTheme(ctx):
     """Returns the user's Herald Theme if one is set."""
+    print("HeraldTheme Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     try:
-        print(str(ctx.author.id))
-        print(ThisServerProfile.HeraldSongs)
+        print("HeraldTheme Printout for Server" + ThisServerProfile.Guild.name + ThisServerProfile.HeraldSongs)
         HeraldID = ctx.author.id
         userMentionTag = ctx.author.mention
         if HeraldID in ThisServerProfile.HeraldSongs.keys():
+            print("Herald theme for user " + ctx.author.name + " is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
             await ctx.send(userMentionTag + "Your Herald theme is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
 
         else:
@@ -228,6 +230,7 @@ async def hello(ctx):
 @bot.command(name="prefix_change")
 async def pref_change(ctx, new_pref):
     """Changes the bot's command prefix to the given parameter"""
+    print("Prefix Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global prefix
     prefix = new_pref  #TODO: The updated prefix is currently stored as instance data...I'd like to change that
     bot.command_prefix = prefix
@@ -268,53 +271,12 @@ async def JumpTo(ctx, TimeStamp):
     else:
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can Fastforward or JumpTo through it!")
 
-
-
-@bot.command(name="PlayFromTime")
-async def PlayFromTimestamp(ctx, url, StartTimeStamp, EndTimeStamp):
-    """THIS WILL WORK.  However, we want to integrate this functionality into herald bot and a timeskip command."""
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    NumSecondsSTART = int(StartTimeStamp)
-    NumSecondsEND = int(EndTimeStamp)
-    if NumSecondsSTART > 362439 or NumSecondsEND > 362439:   # This is the number of seconds equal to 99:99:99.00 in HH:MM:SS.MS
-        return
-    else:
-        Hours = NumSecondsSTART // 3600
-        Minutes = (NumSecondsSTART % 3600) // 60
-        Seconds = NumSecondsSTART % 60
-        STARTTimestampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
-
-        Hours = NumSecondsEND // 3600
-        Minutes = (NumSecondsEND % 3600) // 60
-        Seconds = NumSecondsEND % 60
-        ENDTimestampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
-
-        File = download(url)
-        await join(ctx)
-        ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=File[0], before_options="-ss " + STARTTimestampCode, options="-ss " + ENDTimestampCode))
-        start = time.time()
-        time.clock()
-        elapsed = 0
-        while elapsed < NumSecondsEND:
-            elapsed = time.time() - start
-            await asyncio.sleep(1)
-
-
-
-
-
-
-
 @bot.command(name="Join")
 async def join(ctx):
     """Bot joins the voice channel."""
     global ServerProfiles
 
-    print("\n\nTest values: \n")
-    print(ctx.message.guild)
-    print(ctx.message.guild.name + "\n\n")
-
+    print("Join Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
 
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
 
@@ -326,7 +288,8 @@ async def join(ctx):
     except:
         await ctx.send("User must be in a voice channel")
 
-    if ThisServerProfile.vc is None or not ThisServerProfile.vc.is_connected():
+    if ThisServerProfile.vc is None or not ThisServerProfile.vc.is_connected():  # Check that we aren't already in a voice channel before attempting to connect
+        print("\n\nJoining Guild: " + ctx.message.guild.name)
         await ctx.author.voice.channel.connect()
         ThisServerProfile.vc = discord.utils.get(client.voice_clients, guild=ctx.guild)
     return ThisServerProfile.vc
@@ -334,6 +297,7 @@ async def join(ctx):
 @bot.command(name="Leave")
 async def leave(ctx):
     """Bot leaves the voice channel."""
+    print("Leave Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     print(str(ThisServerProfile))
@@ -342,10 +306,11 @@ async def leave(ctx):
         ThisServerProfile.MusicQueue = queue.Queue()
         if ThisServerProfile.vc:
             ThisServerProfile.vc.stop()
+
     # Then we will disconnect.
-    #await ctx.voice_client.disconnect()
     await ThisServerProfile.vc.disconnect()
 
+    # Reset Server variables
     ThisServerProfile.successful_join = False
     ThisServerProfile.vc = None
     ThisServerProfile.PlayingNOW = False
@@ -354,6 +319,7 @@ async def leave(ctx):
 
 @bot.command(name="Pause")
 async def pause(ctx):
+    print("Pause Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     if ThisServerProfile.playingNOW:
@@ -365,6 +331,7 @@ async def pause(ctx):
 
 @bot.command(name="Resume")
 async def resume(ctx):
+    print("Resume Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     if ThisServerProfile.playingNOW:
@@ -374,23 +341,24 @@ async def resume(ctx):
 
 @bot.command(name="Skip")
 async def skip_song(ctx):
+    print("Skip Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    print("Received Skip Command")
     if ThisServerProfile.playingNOW:
-        ThisServerProfile.vc.stop()
+        ThisServerProfile.vc.stop()  # Stop, trigger waiter event to end and then proceed to next song (if one is there)
     else:
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can skip it!")
 
 
 @bot.command(name="Stop")
 async def stop_playing(ctx):
+    print("Stop Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     if ThisServerProfile.playingNOW:
-        ThisServerProfile.MusicQueue = queue.Queue()
-        ThisServerProfile.vc.stop()
-        ThisServerProfile.playingNOW = False
+        ThisServerProfile.MusicQueue = queue.Queue()  # Clear out the queue
+        ThisServerProfile.vc.stop()  # Stop.  Nothing will play after since the queue is empty now.
+        ThisServerProfile.playingNOW = False  # Show that we aren't playing now.
     else:
         print("Music not playing.  Current queue size: " + str(ThisServerProfile.MusicQueue.qsize()))
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can stop it!")
@@ -399,9 +367,9 @@ async def stop_playing(ctx):
 @bot.command(name="Play")
 async def PlayEnqueue(ctx, url):
     """Command that user interacts with.  Adds urls to a music queue which are popped and played by PlayQ"""
+    print("Enqueue Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     # Initialize global variables
     global ServerProfiles
-    print("A")
     try:  # Check that the command sender is in a voice channel.  If not, ignore the command.
         UserVoiceChannel = ctx.author.voice.channel  # Looks up the user channel.  If this fails (except), then we throw out the command since the user is not in voice.
     except Exception as e:
@@ -412,27 +380,25 @@ async def PlayEnqueue(ctx, url):
 
     try:
         ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-        print("B")
 
-        if "list" in str(url):
+        if "list" in str(url):  # Check if we're dealing with a pleylist
             p = Playlist(str(url))
             await  ctx.send("Queueing up a playlist..." + p.title)
             print("Queueing up a playlist..." + p.title)
             for vid in p.video_urls:
                 ThisServerProfile.MusicQueue.put((ctx, vid))
                 print("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
-        else:
+        else:  # Not dealing with a playlist.  Just a single video.
             ThisServerProfile.MusicQueue.put((ctx, url))  # Add song to queue
             vid = YouTube(str(url))
             await ctx.send(("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize())))
             print("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
 
         if not ThisServerProfile.successful_join:
+            # If we aren't already in voice for this server, then we can join
             await join(ctx)
-        print("C")
-        print(ThisServerProfile.playingNOW)
 
-        if not ThisServerProfile.playingNOW:
+        if not ThisServerProfile.playingNOW:  # Check if we're playing right now.  If we are, no need to start up the queue.
             await PlayQ(ctx, ThisServerProfile.vc)
     except Exception as e:
         await ctx.send("An exception occurred.  Plese check the log for more details.")
@@ -442,41 +408,33 @@ async def PlayEnqueue(ctx, url):
 
 async def PlayQ(ctx, voice):
     """Command used to play the queue of songs/videos enqueued with PlayEnqueue."""
+    print("Running PlayQueue " + " on Guild " + ctx.message.guild.name)
     # Global variable declarations
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     ThisServerProfile.PlayingEvent.set()
     ThisServerProfile.playingNOW = True
-    print("entering PlayQ")
 
     while True:
-        print("3")
-
-
         ThisServerProfile.PlayingEvent.clear()
         Current = ThisServerProfile.MusicQueue.get()  # Pop a song from the queue
         file = download(Current[1])  # Download the song that was linked.
         CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
-        print("4")
         ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
         waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath, ThisServerProfile))
-        print("5")
 
         ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: ThisServerProfile.PlayingEvent.set())
         await ctx.send("NOW PLAYING: " + file[1])
-        print("NOW PLAYING: " + file[1])
-        print("6")
+        print("NOW PLAYING: " + file[1] + " On Guild " + ctx.message.guild.name)
 
 
         await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
-        print("7")
         while ThisServerProfile.SkippingNow:
             await asyncio.sleep(1)
 
-        if ThisServerProfile.MusicQueue.qsize() == 0:
-            print("8")
+        if ThisServerProfile.MusicQueue.qsize() == 0:  # When our queue is empty, we can leave since our work here is done.
             ThisServerProfile.playingNOW = False
-            await leave(ctx)  # This should be fine.  Just wanna leave it comented until I work out the other issue.
+            await leave(ctx)
             break
 
 #endregion
@@ -489,19 +447,15 @@ def CalculateTimeStamp(Seconds):
         Minutes = (Seconds % 3600) // 60
         Seconds = Seconds % 60
         TimeStampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
-        print(TimeStampCode)
         return TimeStampCode
     else:
-        print("99:99:99.00")
         return "99:99:99.00"
 
 async def WaitAndDelete(event, FilePath, ServerProfile):
-    print("1")
+    """Takes an event and waits until it finishes before deleting the provided filepath."""
     await event.wait()
-    print("2")
-
     print("Finished Playing.")
-    print(ServerProfile.SkippingNow)
+    print("Skipping now: ", ServerProfile.SkippingNow)
     if not ServerProfile.SkippingNow:
         print("Deleting file and moving to next song:")
         os.remove(FilePath)
