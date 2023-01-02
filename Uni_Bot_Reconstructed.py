@@ -9,6 +9,7 @@ import queue
 import Token
 import os
 import json
+import time
 
 #region ERROR LOGGING
 """ERROR LOGGING"""
@@ -129,6 +130,7 @@ bot.help_command = MyHelpCommand()
 #region Herald Functionality
 @bot.event
 async def on_voice_state_update(user, before, after):
+    """Triggers Herald Theme.  Awaits user to join voice and plays audio clip if user has set one."""
     global ServerProfiles
     if before.channel is None and after.channel is not None:
        # User has connected to a VoiceChannel
@@ -137,13 +139,19 @@ async def on_voice_state_update(user, before, after):
 
         if user.id in ThisServerProfile.HeraldSongs.keys():
             channel = user.voice.channel  # Note the channel to play music in
+
             if ThisServerProfile.playingNOW:
                 ThisServerProfile.vc.pause()  # Pauses music if any is playing currently.
 
             HeraldVC = await channel.connect()
-            HeraldVC.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source= ThisServerProfile.HeraldSongs[user.id][1]), after=lambda e: print("Done playing for user " + user.name + "."))
+            print(ThisServerProfile.HeraldSongs[user.id][3])
+            print(ThisServerProfile.HeraldSongs[user.id][4])
+            HeraldVC.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source= ThisServerProfile.HeraldSongs[user.id][1],  before_options="-ss " + ThisServerProfile.HeraldSongs[user.id][3]), after=lambda e: print("Done playing for user " + user.name + "."))
 
-            while HeraldVC.is_playing():  # Sleep while the video finishes up playing.
+            start = time.time()
+            elapsed = 0
+            while HeraldVC.is_playing() and elapsed < ThisServerProfile.HeraldSongs[user.id][5]:  # Sleep while the video plays for 15 Seconds
+                elapsed = time.time() - start
                 await asyncio.sleep(1)
 
             if ThisServerProfile.playingNOW:
@@ -152,8 +160,45 @@ async def on_voice_state_update(user, before, after):
                 await HeraldVC.disconnect()
 
 
-@bot.command(name = "HeraldSet", description = "Sets up a herald bot profile.  Provide a short YouTube URL to play every time you join voice.")
-async def HeraldSet(ctx, url):
+@bot.command(name = "HeraldSet", description = "Sets up a herald bot profile.  Provide a short YouTube URL to play every time you join voice.  "
+                                               "Provide a url and timestamp (in seconds) and a 15 second clip starting from that timestamp will be saved.")
+async def HeraldSet(ctx, url, StartTime = 0):
+    """Sets the Herald Theme for the user."""
+    # Initialize global variables
+    global ServerProfiles
+    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+    HeraldUser = ctx.author
+    HeraldKey = HeraldUser.id  # Takes the user's id.  This will be used as the key for the dictionary.
+
+    EndTime = StartTime  # Initialize variable EndTime
+    HeraldVideo = YouTube(str(url))
+    if HeraldVideo.length - StartTime < 15:  # Check if the video clip is less than 15 seconds
+        EndTime = HeraldVideo.length  # If it is, allow the Herald Clip to be less than 15 seconds
+    elif HeraldVideo.length - StartTime >= 15:  # If the remainder of the video after the timestamp is greater than 15 seconds,
+        EndTime = StartTime + 15  # Just take the 15 seconds after the provided timestamp.  If no timestamp was given, this is just the first 15 seconds.
+
+    try:
+        file = downloadHERALD(url)  # Returns tuple containing the filepath and file name
+    except:
+        await ctx.send("ERROR: Herald Theme download failed.")
+        print("ERROR: Herald Theme download failed.")
+    StartTimeStampCode = CalculateTimeStamp(StartTime)
+    print(StartTimeStampCode)
+    EndTimeStampCode = CalculateTimeStamp(EndTime)
+    print(EndTimeStampCode)
+    ThisServerProfile.HeraldSongs[HeraldKey] = (url, file[0], file[1], StartTimeStampCode, EndTimeStampCode, EndTime)  # Stores the file as a tuple: URL (backup), filepath, file name, StartTime, EndTime
+
+    userMentionTag = HeraldUser.mention
+    await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
+
+    if not os.path.exists("HeraldBackups"):
+        os.makedirs("HeraldBackups")
+    BackupFile = "HeraldBackups/" + str(ThisServerProfile.Guild.id) + ".json"
+    with open(BackupFile, "w") as outfile:
+        json.dump(ThisServerProfile.HeraldSongs, outfile)
+
+@bot.command(name = "HeraldSetOLD", description = "Sets up a herald bot profile.  Provide a short YouTube URL to play every time you join voice.")
+async def HeraldSetOLD(ctx, url):
     """Sets the Herald Theme for the user."""
     # Initialize global variables
     global ServerProfiles
@@ -238,7 +283,12 @@ async def PlayFromTimestamp(ctx, url, StartTimeStamp, EndTimeStamp):
         File = download(url)
         await join(ctx)
         ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=File[0], before_options="-ss " + STARTTimestampCode, options="-ss " + ENDTimestampCode))
-
+        start = time.time()
+        time.clock()
+        elapsed = 0
+        while elapsed < NumSecondsEND:
+            elapsed = time.time() - start
+            await asyncio.sleep(1)
 
 
 
@@ -422,6 +472,23 @@ async def PlayQ(ctx, voice):
             ThisServerProfile.playingNOW = False
             await leave(ctx)  # This should be fine.  Just wanna leave it comented until I work out the other issue.
             break
+
+#endregion
+
+#region Helper Functions
+def CalculateTimeStamp(Seconds):
+    """Returns a timestamp in format HH:MM:SS.MS, given a timestamp in seconds (integer)."""
+    if Seconds < 362439:   # This is the number of seconds equal to 99:99:99.00 in HH:MM:SS.MS
+        Hours = Seconds // 3600
+        Minutes = (Seconds % 3600) // 60
+        Seconds = Seconds % 60
+        TimeStampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
+        print(TimeStampCode)
+        return TimeStampCode
+    else:
+        print("99:99:99.00")
+        return "99:99:99.00"
+
 
 #endregion
 
