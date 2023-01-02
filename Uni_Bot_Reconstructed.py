@@ -93,6 +93,7 @@ class Guild_Profile():
         self.vc = None
         self.playingNOW = False
         self.PlayingEvent = asyncio.Event()
+        self.CurrentSong = (None, None)   # Note this variable is only used for the purposes of JumpTo
 
     def __str__(self):
         """Creates a readble format to see the Guild Profile Data"""
@@ -197,32 +198,6 @@ async def HeraldSet(ctx, url, StartTime = 0):
     with open(BackupFile, "w") as outfile:
         json.dump(ThisServerProfile.HeraldSongs, outfile)
 
-@bot.command(name = "HeraldSetOLD", description = "Sets up a herald bot profile.  Provide a short YouTube URL to play every time you join voice.")
-async def HeraldSetOLD(ctx, url):
-    """Sets the Herald Theme for the user."""
-    # Initialize global variables
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    HeraldUser = ctx.author
-    HeraldKey = HeraldUser.id  # Takes the user's id.  This will be used as the key for the dictionary.
-
-    try:
-        file = downloadHERALD(url)  # Returns tuple containing the filepath and file name
-    except:
-        await ctx.send("ERROR: Herald Theme download failed.")
-        print("ERROR: Herald Theme download failed.")
-
-    ThisServerProfile.HeraldSongs[HeraldKey] = (url, file[0], file[1])  # Stores the file as a tuple: URL (backup), filepath, file name.
-
-    userMentionTag = HeraldUser.mention
-    await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
-
-    if not os.path.exists("HeraldBackups"):
-        os.makedirs("HeraldBackups")
-    BackupFile = "HeraldBackups/" + str(ThisServerProfile.Guild.id) + ".json"
-    with open(BackupFile, "w") as outfile:
-        json.dump(ThisServerProfile.HeraldSongs, outfile)
-
 @bot.command(name = "HeraldTheme", description = "Returns the user's herald theme.")
 async def HeraldTheme(ctx):
     """Returns the user's Herald Theme if one is set."""
@@ -260,6 +235,40 @@ async def pref_change(ctx, new_pref):
 #endregion
 
 #region Voice_Channel_Commands
+
+@bot.command(name="JumpTo")
+async def JumpTo(ctx, TimeStamp):
+    global ServerProfiles
+    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+
+    print("Received JumpTo Command ("+TimeStamp+"s)")
+    if ThisServerProfile.playingNOW:
+
+        CurrentVideo = YouTube(ThisServerProfile.CurrentSong[1])  # Make sure this is actually url
+        if int(TimeStamp) < CurrentVideo.length:
+            ThisServerProfile.vc.pause()
+
+            JumpVideoEvent = asyncio.Event()
+            print("5")
+            STARTTimestampCode = CalculateTimeStamp(int(TimeStamp))
+            waiter_task = asyncio.create_task(JumpVideoEvent.wait())
+            ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=ThisServerProfile.CurrentSong[0], before_options="-ss " + STARTTimestampCode), after=lambda e: JumpVideoEvent.set())
+
+            await ctx.send("Skipped to " + STARTTimestampCode)
+            print("Skipped to " + STARTTimestampCode)
+            await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
+            print("7")
+            ThisServerProfile.vc.resume()
+            ThisServerProfile.vc.stop()  # Now that we skipped and played the song, skip the original player (PlayQ will take care of deleting).
+            # Check on deletion and queue checking.
+
+        else:
+            await ctx.send(ctx.author.mention + " Invalid timestamp.  Please select a timestamp less than the videolength (in seconds).")
+    else:
+        await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can Fastforward or JumpTo through it!")
+
+
+
 @bot.command(name="PlayFromTime")
 async def PlayFromTimestamp(ctx, url, StartTimeStamp, EndTimeStamp):
     """THIS WILL WORK.  However, we want to integrate this functionality into herald bot and a timeskip command."""
@@ -439,14 +448,6 @@ async def PlayQ(ctx, voice):
     ThisServerProfile.playingNOW = True
     print("entering PlayQ")
 
-    async def WaitAndDelete(event, FilePath):
-        print("1")
-        await event.wait()
-        print("2")
-
-        print("Finished Playing. Deleting file and moving to next song:")
-        os.remove(FilePath)
-
     while True:
         print("3")
 
@@ -455,6 +456,7 @@ async def PlayQ(ctx, voice):
         file = download(Current[1])  # Download the song that was linked.
         CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
         print("4")
+        ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
         waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath))
         print("5")
 
@@ -488,6 +490,14 @@ def CalculateTimeStamp(Seconds):
     else:
         print("99:99:99.00")
         return "99:99:99.00"
+
+async def WaitAndDelete(event, FilePath):
+    print("1")
+    await event.wait()
+    print("2")
+
+    print("Finished Playing. Deleting file and moving to next song:")
+    os.remove(FilePath)
 
 
 #endregion
