@@ -94,6 +94,7 @@ class Guild_Profile():
         self.playingNOW = False
         self.PlayingEvent = asyncio.Event()
         self.CurrentSong = (None, None)   # Note this variable is only used for the purposes of JumpTo
+        self.SkippingNow = False # Note that this variable is only used for the purposes of JumpTo
 
     def __str__(self):
         """Creates a readble format to see the Guild Profile Data"""
@@ -246,21 +247,21 @@ async def JumpTo(ctx, TimeStamp):
 
         CurrentVideo = YouTube(ThisServerProfile.CurrentSong[1])  # Make sure this is actually url
         if int(TimeStamp) < CurrentVideo.length:
-            ThisServerProfile.vc.pause()
+            SongToDelete = ThisServerProfile.CurrentSong[0]  # Note down the filepath so we can remove it.
+            ThisServerProfile.SkippingNow = True
+            ThisServerProfile.vc.stop()
 
             JumpVideoEvent = asyncio.Event()
-            print("5")
-            STARTTimestampCode = CalculateTimeStamp(int(TimeStamp))
-            waiter_task = asyncio.create_task(JumpVideoEvent.wait())
+            STARTTimestampCode = CalculateTimeStamp(int(TimeStamp))  # Convert timestamp code to version FFMPEG can use.  Easier to do this than sanitize timestamp inputs.
+            waiter_task = asyncio.create_task(WaitAndDelete(JumpVideoEvent, SongToDelete, ThisServerProfile))
+
             ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=ThisServerProfile.CurrentSong[0], before_options="-ss " + STARTTimestampCode), after=lambda e: JumpVideoEvent.set())
 
             await ctx.send("Skipped to " + STARTTimestampCode)
             print("Skipped to " + STARTTimestampCode)
             await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
-            print("7")
-            ThisServerProfile.vc.resume()
-            ThisServerProfile.vc.stop()  # Now that we skipped and played the song, skip the original player (PlayQ will take care of deleting).
-            # Check on deletion and queue checking.
+            os.remove(SongToDelete)  # Delete the file ourselves since we told the waiter task not to delete while we're fastforwarding
+            ThisServerProfile.SkippingNow = False
 
         else:
             await ctx.send(ctx.author.mention + " Invalid timestamp.  Please select a timestamp less than the videolength (in seconds).")
@@ -451,13 +452,14 @@ async def PlayQ(ctx, voice):
     while True:
         print("3")
 
+
         ThisServerProfile.PlayingEvent.clear()
         Current = ThisServerProfile.MusicQueue.get()  # Pop a song from the queue
         file = download(Current[1])  # Download the song that was linked.
         CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
         print("4")
         ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
-        waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath))
+        waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath, ThisServerProfile))
         print("5")
 
         ThisServerProfile.vc.play(FFmpegPCMAudio(executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe", source=CurrentSongFilePath), after=lambda e: ThisServerProfile.PlayingEvent.set())
@@ -468,6 +470,8 @@ async def PlayQ(ctx, voice):
 
         await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
         print("7")
+        while ThisServerProfile.SkippingNow:
+            await asyncio.sleep(1)
 
         if ThisServerProfile.MusicQueue.qsize() == 0:
             print("8")
@@ -491,13 +495,16 @@ def CalculateTimeStamp(Seconds):
         print("99:99:99.00")
         return "99:99:99.00"
 
-async def WaitAndDelete(event, FilePath):
+async def WaitAndDelete(event, FilePath, ServerProfile):
     print("1")
     await event.wait()
     print("2")
 
-    print("Finished Playing. Deleting file and moving to next song:")
-    os.remove(FilePath)
+    print("Finished Playing.")
+    print(ServerProfile.SkippingNow)
+    if not ServerProfile.SkippingNow:
+        print("Deleting file and moving to next song:")
+        os.remove(FilePath)
 
 
 #endregion
