@@ -282,14 +282,15 @@ async def HeraldTheme(ctx):
 # endregion
 
 # region Generic Commands
-@bot.command()
+@bot.command(name="Hello", description="Tags the user to greet them.")
 async def hello(ctx):
+    """Tags the user to greet them."""
     await ctx.send(ctx.author.mention + " hello!")
 
 
-@bot.command(name="prefix_change")
+@bot.command(name="prefix_change", description="Changes the command prefix to the given parameter")
 async def pref_change(ctx, new_pref):
-    """Changes the bot's command prefix to the given parameter"""
+    """Changes the command prefix to the given parameter"""
     print("Prefix Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
 
     global ServerPrefixes
@@ -304,8 +305,9 @@ async def pref_change(ctx, new_pref):
 
 # region Voice_Channel_Commands
 
-@bot.command(name="JumpTo")
+@bot.command(name="JumpTo", description="If a song is currently playing, jumps to the given timestamp (in seconds).")
 async def JumpTo(ctx, TimeStamp):
+    """If a song is currently playing, jumps to the given timestamp."""
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
 
@@ -343,7 +345,7 @@ async def JumpTo(ctx, TimeStamp):
             ctx.author.mention + " No audio playing.  You'll need to play something before you can Fastforward or JumpTo through it!")
 
 
-@bot.command(name="Join")
+@bot.command(name="Join", description="Summons Unicron to join the voice channel.")
 async def join(ctx):
     """Bot joins the voice channel."""
     global ServerProfiles
@@ -367,7 +369,7 @@ async def join(ctx):
     return ThisServerProfile.vc
 
 
-@bot.command(name="Leave")
+@bot.command(name="Leave", description="Commands the bot to leave the voice channel.")
 async def leave(ctx):
     """Bot leaves the voice channel."""
     print("Leave Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
@@ -390,8 +392,9 @@ async def leave(ctx):
     ThisServerProfile.PlayingEvent.clear()
 
 
-@bot.command(name="Pause")
+@bot.command(name="Pause", description="Pauses the audio, if any if playing.  Resume with Resume.")
 async def pause(ctx):
+    """Pauses the audio, if any if playing.  Resume with Resume."""
     print("Pause Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
@@ -403,8 +406,9 @@ async def pause(ctx):
         await ctx.send(ctx.author.mention + " No audio playing.  Play something with command: Play")
 
 
-@bot.command(name="Resume")
+@bot.command(name="Resume", description="Resumes the audio if any was playing or paused.")
 async def resume(ctx):
+    """Resumes the audio if any was playing or paused."""
     print("Resume Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
@@ -415,8 +419,9 @@ async def resume(ctx):
             ctx.author.mention + " No audio playing.  Maybe you meant to play something with command: Play")
 
 
-@bot.command(name="Skip")
+@bot.command(name="Skip", description="Skips the current song if any was playing.")
 async def skip_song(ctx):
+    """Skips the current song if any was playing."""
     print("Skip Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
@@ -426,8 +431,9 @@ async def skip_song(ctx):
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can skip it!")
 
 
-@bot.command(name="Stop")
+@bot.command(name="Stop", description="Stops playing all audio and clears the queue.")
 async def stop_playing(ctx):
+    """Stops playing all audio and clears the queue."""
     print("Stop Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
@@ -440,7 +446,7 @@ async def stop_playing(ctx):
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can stop it!")
 
 
-@bot.command(name="Play")
+@bot.command(name="Play", description="Adds a video to the music queue.")
 async def PlayEnqueue(ctx, url):
     """Command that user interacts with.  Adds urls to a music queue which are popped and played by PlayQ"""
     print("Enqueue Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
