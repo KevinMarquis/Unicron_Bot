@@ -33,7 +33,7 @@ def download(url):
 
     # result of success
     print(yt.title + " has been successfully downloaded.")
-    filepath = os.path.join(destination, "AUDIO" + suffix + extension)
+    filepath = os.path.join(destination, "Audio" + suffix + extension)
     VideoName = yt.title
     return (filepath, VideoName)
 
