@@ -36,6 +36,8 @@ intents.message_content = True
 token = Token.HiddenToken  # Pull the token from another file.
 ServerProfiles = dict()  # Initializes a dictionary with server ids as keys to another dictionary, with particular data.
 ServerPrefixes = dict()  # Initializes a dictionary with server ids as keys to the command prefix for that server.
+CWD = os.getcwd()
+FFmpegPCMAudio_FilePath = os.path.join(CWD, "ffmpeg-2022-10-27-git-00b03331a0-full_build", "bin", "ffmpeg.exe")
 
 
 def get_prefix(client, message):
@@ -61,9 +63,9 @@ async def on_ready():
 
     if not os.path.exists("Backups"):
         os.makedirs("Backups")
-    if os.path.exists("Backups/Prefixes.json"):
+    BackupFile = os.path.join("Backups", "Prefixes.json")
+    if os.path.exists(BackupFile):
         print("Restoring Custom Prefixes")
-        BackupFile = "Backups/Prefixes.json"
         with open(BackupFile, "r") as PrefixBackup:
             ServerPrefixes = json.load(PrefixBackup)
 
@@ -73,7 +75,7 @@ async def on_ready():
                 NewKey = int(OldKey)
                 NewServerPrefixDict[NewKey] = ServerPrefixes[OldKey]
             except ValueError:
-                print("Error in adapting HeraldSongs from JSON.")
+                print("Error in adapting Prefixes from JSON.")
         ServerPrefixes = NewServerPrefixDict
 
 
@@ -85,8 +87,9 @@ async def on_ready():
         print(guild.name)
 
         BackupFileName = str(guild.id) + ".json"
-        if os.path.exists("HeraldBackups/" + BackupFileName):
-            with open("HeraldBackups/" + BackupFileName, 'r') as backup:
+        BackupFolder = os.path.join("HeraldBackups", BackupFileName)
+        if os.path.exists(BackupFolder):
+            with open(BackupFolder, 'r') as backup:
                 ServerProfiles[guild.id].HeraldSongs = json.load(backup)
                 print("Retreived Herald Profiles!")
 
@@ -94,7 +97,7 @@ async def on_ready():
             for userID in ServerProfiles[guild.id].HeraldSongs.keys():
                 HeraldProfile = ServerProfiles[guild.id].HeraldSongs[userID]
                 try:
-                    File = downloadHERALD(HeraldProfile[0])
+                    File = downloadHERALD(HeraldProfile[0], userID)
                     HeraldProfile[1] = File[0]
                     HeraldProfile[2] = File[1]
                 except Exception as e:
@@ -132,8 +135,11 @@ class Guild_Profile():
         self.vc = None
         self.playingNOW = False
         self.PlayingEvent = asyncio.Event()
-        self.CurrentSong = (None, None)  # Note this variable is only used for the purposes of JumpTo
+        self.CurrentSong = (None, None)  # (Filepath, URL)
         self.SkippingNow = False  # Note that this variable is only used for the purposes of JumpTo
+        self.CurrentMusicStartTime = None # This is used to track the current timestamp of the song playing so that it can resume properly when interrupted by Herald
+        self.InterruptedByHerald = False
+        self.LazyDeleteSongs = []  # A list of songs to delete when the bot leaves voice that were put on hold due to Herald.
 
     def __str__(self):
         """Creates a readble format to see the Guild Profile Data"""
@@ -174,6 +180,7 @@ bot.help_command = MyHelpCommand()
 @bot.event
 async def on_voice_state_update(user, before, after):
     """Triggers Herald Theme.  Awaits user to join voice and plays audio clip if user has set one."""
+    global FFmpegPCMAudio_FilePath
     global ServerProfiles
     if before.channel is None and after.channel is not None:
         # User has connected to a VoiceChannel
@@ -181,30 +188,62 @@ async def on_voice_state_update(user, before, after):
         ThisServerProfile = ServerProfiles[after.channel.guild.id]
 
         if user.id in ThisServerProfile.HeraldSongs.keys():
-            print("Heralding " + user.name)
+            print("Heralding " + user.name + " on Guild " + ThisServerProfile.Guild.name)
             channel = user.voice.channel  # Note the channel to play music in
+            RestoreTime = ThisServerProfile.CurrentMusicStartTime
 
             if ThisServerProfile.playingNOW:
+                ThisServerProfile.InterruptedByHerald = True
+                RestoreTime = int(time.time() - ThisServerProfile.CurrentMusicStartTime)
+                print(RestoreTime)
                 ThisServerProfile.vc.pause()  # Pauses music if any is playing currently.
 
-            HeraldVC = await channel.connect()
-            HeraldVC.play(FFmpegPCMAudio(
-                executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",
-                source=ThisServerProfile.HeraldSongs[user.id][1],
-                before_options="-ss " + ThisServerProfile.HeraldSongs[user.id][3]),
-                          after=lambda e: print("Done playing for user " + user.name + "."))
+            if not ThisServerProfile.vc.is_connected():
+                ThisServerProfile.vc = await channel.connect()
+                ThisServerProfile.successful_join = True
+            ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=ThisServerProfile.HeraldSongs[user.id][1], before_options="-ss " + ThisServerProfile.HeraldSongs[user.id][3]), after=lambda e: print("Done playing for user " + user.name + "."))
 
             start = time.time()  # Check the starttime so we can only play for 15s or less.
             elapsed = 0
-            while HeraldVC.is_playing() and elapsed < ThisServerProfile.HeraldSongs[user.id][
-                5]:  # Sleep while the video plays for 15 Seconds
+
+            while elapsed < ThisServerProfile.HeraldSongs[user.id][5]:  # Sleep while the video plays for 15 Seconds
+                print("Waiting for Herald to finish...", elapsed)
                 elapsed = time.time() - start
                 await asyncio.sleep(1)
 
+            print("Done Waiting")
+            print("PlayingNow: ", ThisServerProfile.playingNOW)
+
             if ThisServerProfile.playingNOW:
-                ThisServerProfile.vc.resume()  # resumes music if any was playing.
+                print("Resuming Music")
+                Timestamp = CalculateTimeStamp(RestoreTime)
+                ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=ThisServerProfile.CurrentSong[0], before_options="-ss " + Timestamp), after=lambda e: ThisServerProfile.PlayingEvent.set())
             else:
-                await HeraldVC.disconnect()
+                #await HeraldVC.disconnect()
+                await ThisServerProfile.vc.disconnect()
+
+                # Reset Server variables
+                ThisServerProfile.successful_join = False
+                ThisServerProfile.vc = None
+                ThisServerProfile.PlayingNOW = False
+                ThisServerProfile.PlayingEvent.clear()
+    elif before.channel is not None and after.channel is None:
+            # Indicates someone leaving voice chat.
+            if user.id == 1035362429758083072: # This is the bot's id.  So, if the bot disconnects from voice
+                ThisServerProfile = ServerProfiles[before.channel.guild.id]
+                try:
+                    if ThisServerProfile.vc:
+                        ThisServerProfile.vc.stop()
+                except Exception as e:
+                    print("Error: Failed to properly stop voice when disconnecting.")
+                    print(e)
+                for filepath in ThisServerProfile.LazyDeleteSongs:  # delete all lazy delete songs
+                    try:
+                        os.remove(filepath)
+                    except Exception as e:
+                        print("Error: Failed to remove song with filepath: " + filepath)
+                        print(e)
+
 
 
 @bot.command(name="HeraldSet",
@@ -218,6 +257,8 @@ async def HeraldSet(ctx, url, StartTime=0):
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
     HeraldUser = ctx.author
     HeraldKey = HeraldUser.id  # Takes the user's id.  This will be used as the key for the dictionary.
+    if HeraldKey in ThisServerProfile.HeraldSongs:
+        os.remove(ThisServerProfile.HeraldSongs[HeraldKey][1])
 
     EndTime = StartTime  # Initialize variable EndTime
     HeraldVideo = YouTube(str(url))
@@ -227,23 +268,21 @@ async def HeraldSet(ctx, url, StartTime=0):
         EndTime = StartTime + 15  # Just take the 15 seconds after the provided timestamp.  If no timestamp was given, this is just the first 15 seconds.
 
     try:
-        file = downloadHERALD(url)  # Returns tuple containing the filepath and file name
+        file = downloadHERALD(url, HeraldKey)  # Returns tuple containing the filepath and file name
     except:
         await ctx.send("ERROR: Herald Theme download failed.")
         print("ERROR: Herald Theme download failed.")
+
     StartTimeStampCode = CalculateTimeStamp(StartTime)
     print("Starting Timestamp for user " + HeraldUser.name + ":", StartTimeStampCode)
     EndTimeStampCode = CalculateTimeStamp(EndTime)
     print("Starting Timestamp for user " + HeraldUser.name + ":", EndTimeStampCode)
-    ThisServerProfile.HeraldSongs[HeraldKey] = (url, file[0], file[1], StartTimeStampCode, EndTimeStampCode,
-                                                EndTime)  # Stores the file as a tuple: URL (backup), filepath, file name, StartTime, EndTime
+    ThisServerProfile.HeraldSongs[HeraldKey] = (url, file[0], file[1], StartTimeStampCode, EndTimeStampCode, EndTime)  # Stores the file as a tuple: URL (backup), filepath, file name, StartTime, EndTime
 
     userMentionTag = HeraldUser.mention
     print("Success!  Herald theme for " + HeraldUser.name + " has been changed to: " +
           ThisServerProfile.HeraldSongs[HeraldKey][2])
-    await ctx.send(
-        userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][
-            2])
+    await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
 
     if not os.path.exists("HeraldBackups"):
         os.makedirs("HeraldBackups")
@@ -263,12 +302,8 @@ async def HeraldTheme(ctx):
         HeraldID = ctx.author.id
         userMentionTag = ctx.author.mention
         if HeraldID in ThisServerProfile.HeraldSongs.keys():
-            print("Herald theme for user " + ctx.author.name + " is: " + ThisServerProfile.HeraldSongs[HeraldID][
-                2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
-            await ctx.send(
-                userMentionTag + "Your Herald theme is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " +
-                ThisServerProfile.HeraldSongs[HeraldID][0])
-
+            print("Herald theme for user " + ctx.author.name + " is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
+            await ctx.send(userMentionTag + "Your Herald theme is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
         else:
             await ctx.send(
                 userMentionTag + "You do not have a Herald theme set.  To set one use the HeraldSet command, along with a link to a short youtube video.")
@@ -308,12 +343,12 @@ async def pref_change(ctx, new_pref):
 @bot.command(name="JumpTo", description="If a song is currently playing, jumps to the given timestamp (in seconds).")
 async def JumpTo(ctx, TimeStamp):
     """If a song is currently playing, jumps to the given timestamp."""
+    global FFmpegPCMAudio_FilePath
     global ServerProfiles
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
 
     print("Received JumpTo Command (" + TimeStamp + "s)")
     if ThisServerProfile.playingNOW:
-
         CurrentVideo = YouTube(ThisServerProfile.CurrentSong[1])  # Make sure this is actually url
         if int(TimeStamp) < CurrentVideo.length:
             SongToDelete = ThisServerProfile.CurrentSong[0]  # Note down the filepath so we can remove it.
@@ -321,28 +356,21 @@ async def JumpTo(ctx, TimeStamp):
             ThisServerProfile.vc.stop()
 
             JumpVideoEvent = asyncio.Event()
-            STARTTimestampCode = CalculateTimeStamp(
-                int(TimeStamp))  # Convert timestamp code to version FFMPEG can use.  Easier to do this than sanitize timestamp inputs.
+            STARTTimestampCode = CalculateTimeStamp(int(TimeStamp))  # Convert timestamp code to version FFMPEG can use.  Easier to do this than sanitize timestamp inputs.
             waiter_task = asyncio.create_task(WaitAndDelete(JumpVideoEvent, SongToDelete, ThisServerProfile))
 
-            ThisServerProfile.vc.play(FFmpegPCMAudio(
-                executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",
-                source=ThisServerProfile.CurrentSong[0], before_options="-ss " + STARTTimestampCode),
-                                      after=lambda e: JumpVideoEvent.set())
+            ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath,source=ThisServerProfile.CurrentSong[0], before_options="-ss " + STARTTimestampCode), after=lambda e: JumpVideoEvent.set())
 
             await ctx.send("Skipped to " + STARTTimestampCode)
             print("Skipped to " + STARTTimestampCode)
             await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
-            os.remove(
-                SongToDelete)  # Delete the file ourselves since we told the waiter task not to delete while we're fastforwarding
+            os.remove(SongToDelete)  # Delete the file ourselves since we told the waiter task not to delete while we're fastforwarding
             ThisServerProfile.SkippingNow = False
 
         else:
-            await ctx.send(
-                ctx.author.mention + " Invalid timestamp.  Please select a timestamp less than the videolength (in seconds).")
+            await ctx.send(ctx.author.mention + " Invalid timestamp.  Please select a timestamp less than the videolength (in seconds).")
     else:
-        await ctx.send(
-            ctx.author.mention + " No audio playing.  You'll need to play something before you can Fastforward or JumpTo through it!")
+        await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can Fastforward or JumpTo through it!")
 
 
 @bot.command(name="Join", description="Summons Unicron to join the voice channel.")
@@ -351,7 +379,6 @@ async def join(ctx):
     global ServerProfiles
 
     print("Join Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-
     ThisServerProfile = ServerProfiles[ctx.message.guild.id]
 
     try:  # Checks if user is in a voice channel
@@ -473,8 +500,7 @@ async def PlayEnqueue(ctx, url):
         else:  # Not dealing with a playlist.  Just a single video.
             ThisServerProfile.MusicQueue.put((ctx, url))  # Add song to queue
             vid = YouTube(str(url))
-            await ctx.send(
-                ("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize())))
+            await ctx.send("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
             print("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
 
         if not ThisServerProfile.successful_join:
@@ -499,28 +525,26 @@ async def PlayQ(ctx, voice):
     ThisServerProfile.playingNOW = True
 
     while True:
-        ThisServerProfile.PlayingEvent.clear()
-        Current = ThisServerProfile.MusicQueue.get()  # Pop a song from the queue
-        file = download(Current[1])  # Download the song that was linked.
-        CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
-        ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
-        waiter_task = asyncio.create_task(
-            WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath, ThisServerProfile))
+        if not ThisServerProfile.InterruptedByHerald:  # If we're interrupted by Herald, we want to keep looping without doing anything until the flag is lowered.
+            ThisServerProfile.PlayingEvent.clear()
+            Current = ThisServerProfile.MusicQueue.get()  # Pop a song from the queue
+            file = download(Current[1])  # Download the song that was linked.
+            CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
+            ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
+            waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath, ThisServerProfile))
 
-        ThisServerProfile.vc.play(FFmpegPCMAudio(
-            executable="D:/kevin/Git Repos/Unicron_Bot/ffmpeg-2022-10-27-git-00b03331a0-full_build/bin/ffmpeg.exe",
-            source=CurrentSongFilePath), after=lambda e: ThisServerProfile.PlayingEvent.set())
-        await ctx.send("NOW PLAYING: " + file[1])
-        print("NOW PLAYING: " + file[1] + " On Guild " + ctx.message.guild.name)
+            ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=CurrentSongFilePath), after=lambda e: ThisServerProfile.PlayingEvent.set())
+            await ctx.send("NOW PLAYING: " + file[1])
+            print("NOW PLAYING: " + file[1] + " On Guild " + ctx.message.guild.name)
+            ThisServerProfile.CurrentMusicStartTime = time.time()
+            await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
+            while ThisServerProfile.SkippingNow:
+                await asyncio.sleep(1)
 
-        await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
-        while ThisServerProfile.SkippingNow:
-            await asyncio.sleep(1)
-
-        if ThisServerProfile.MusicQueue.qsize() == 0:  # When our queue is empty, we can leave since our work here is done.
-            ThisServerProfile.playingNOW = False
-            await leave(ctx)
-            break
+            if ThisServerProfile.MusicQueue.qsize() == 0:  # When our queue is empty, we can leave since our work here is done.
+                ThisServerProfile.playingNOW = False
+                await leave(ctx)
+                break
 
 
 # endregion
@@ -544,8 +568,13 @@ async def WaitAndDelete(event, FilePath, ServerProfile):
     print("Finished Playing.")
     print("Skipping now: ", ServerProfile.SkippingNow)
     if not ServerProfile.SkippingNow:
-        print("Deleting file and moving to next song:")
-        os.remove(FilePath)
+        if not ServerProfile.InterruptedByHerald:
+            print("Deleting file and moving to next song:")
+            os.remove(FilePath)
+        else:
+            print("Interrupted by Herald, so adding song to lazy delete list to be cleared when leaving voice channel.")
+            ServerProfile.LazyDeleteSongs.append(FilePath)
+            ServerProfile.InterruptedByHerald = False
 
 
 # endregion
