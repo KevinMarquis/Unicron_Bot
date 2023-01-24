@@ -32,13 +32,14 @@ logger.addHandler(handler)
 # region Setup
 intents = discord.Intents.default()  # Set bot permissions.
 intents.message_content = True
+#This may need to be commented out for linux ^
 
 token = Token.HiddenToken  # Pull the token from another file.
 ServerProfiles = dict()  # Initializes a dictionary with server ids as keys to another dictionary, with particular data.
 ServerPrefixes = dict()  # Initializes a dictionary with server ids as keys to the command prefix for that server.
 CWD = os.getcwd()
-FFmpegPCMAudio_FilePath = os.path.join(CWD, "ffmpeg-2022-10-27-git-00b03331a0-full_build", "bin", "ffmpeg.exe")
-
+FFmpegPCMAudio_FilePath = os.path.join(CWD, "ffmpeg-2022-10-27-git-00b03331a0-full_build", "bin", "ffmpeg.exe")  #WINDOWS
+#FFmpegPCMAudio_FilePath = os.path.join("/usr", "bin", "ffmpeg")  # RASBIAN/LINUX
 
 def get_prefix(client, message):
     global ServerPrefixes
@@ -94,15 +95,16 @@ async def on_ready():
                 print("Retreived Herald Profiles!")
 
             print("Restoring Herald Videos!")
-            for userID in ServerProfiles[guild.id].HeraldSongs.keys():
-                HeraldProfile = ServerProfiles[guild.id].HeraldSongs[userID]
-                try:
-                    File = downloadHERALD(HeraldProfile[0], userID)
-                    HeraldProfile[1] = File[0]
-                    HeraldProfile[2] = File[1]
-                except Exception as e:
-                    print("ERROR in Restoring Herald Profile for USER ID: ", userID)
-                    print(e)
+            await HeraldRestore(guild.id)
+            # for userID in ServerProfiles[guild.id].HeraldSongs.keys():
+            #     HeraldProfile = ServerProfiles[guild.id].HeraldSongs[userID]
+            #     try:
+            #         File = downloadHERALD(HeraldProfile[0], userID)
+            #         HeraldProfile[1] = File[0]
+            #         HeraldProfile[2] = File[1]
+            #     except Exception as e:
+            #         print("ERROR in Restoring Herald Profile for USER ID: ", userID)
+            #         print(e)
 
             newHeraldProfileDict = {}
             for OldKey in ServerProfiles[guild.id].HeraldSongs.keys():
@@ -112,8 +114,7 @@ async def on_ready():
                 except ValueError:
                     print("Error in adapting HeraldSongs from JSON.")
             ServerProfiles[guild.id].HeraldSongs = newHeraldProfileDict
-
-    # Add a case for pulling from saved data (i.e. restoring Herald Profiles).  We'll get to that later though.
+    print("SETUP ENDED.  READY TO OPERATE.")
 
 
 @bot.event
@@ -198,7 +199,7 @@ async def on_voice_state_update(user, before, after):
                 print(RestoreTime)
                 ThisServerProfile.vc.pause()  # Pauses music if any is playing currently.
 
-            if not ThisServerProfile.vc.is_connected():
+            if not ThisServerProfile.successful_join: #ThisServerProfile.vc.is_connected():
                 ThisServerProfile.vc = await channel.connect()
                 ThisServerProfile.successful_join = True
             ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=ThisServerProfile.HeraldSongs[user.id][1], before_options="-ss " + ThisServerProfile.HeraldSongs[user.id][3]), after=lambda e: print("Done playing for user " + user.name + "."))
@@ -576,6 +577,19 @@ async def WaitAndDelete(event, FilePath, ServerProfile):
             ServerProfile.LazyDeleteSongs.append(FilePath)
             ServerProfile.InterruptedByHerald = False
 
+#@asyncio.to_thread
+async def HeraldRestore(guildID):
+    for userID in ServerProfiles[guildID].HeraldSongs.keys():
+        HeraldProfile = ServerProfiles[guildID].HeraldSongs[userID]
+        try:
+            File = downloadHERALD(HeraldProfile[0], userID)
+            HeraldProfile[1] = File[0]
+            HeraldProfile[2] = File[1]
+        except Exception as e:
+            print("ERROR in Restoring Herald Profile for USER ID: ", userID)
+            print(e)
+
+
 
 # endregion
 
@@ -583,4 +597,5 @@ async def WaitAndDelete(event, FilePath, ServerProfile):
 # Assume client refers to a discord.Client subclass...
 # Suppress the default configuration since we have our own
 # client.run(token, log_handler=None)
-bot.run(token)
+if __name__ == "__main__":
+    bot.run(token)
