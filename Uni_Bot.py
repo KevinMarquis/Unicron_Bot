@@ -609,7 +609,6 @@ if __name__ == "__main__":
                         file = downloadHERALD(TempHeraldRestoration[userID][0], userID)
                         print("Download successful.")
                         TempHeraldRestoration[userID][1] = file[0]
-                        print(TempHeraldRestoration)
 
                 except Exception as e:
                     print("Error with opening HeraldBackup JSON")
