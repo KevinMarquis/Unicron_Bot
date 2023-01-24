@@ -94,17 +94,7 @@ async def on_ready():
                 ServerProfiles[guild.id].HeraldSongs = json.load(backup)
                 print("Retreived Herald Profiles!")
 
-            print("Restoring Herald Videos!")
-            await HeraldRestore(guild.id)
-            # for userID in ServerProfiles[guild.id].HeraldSongs.keys():
-            #     HeraldProfile = ServerProfiles[guild.id].HeraldSongs[userID]
-            #     try:
-            #         File = downloadHERALD(HeraldProfile[0], userID)
-            #         HeraldProfile[1] = File[0]
-            #         HeraldProfile[2] = File[1]
-            #     except Exception as e:
-            #         print("ERROR in Restoring Herald Profile for USER ID: ", userID)
-            #         print(e)
+                # We've already downloaded the Herald videos, so we just need to load the dictionaries
 
             newHeraldProfileDict = {}
             for OldKey in ServerProfiles[guild.id].HeraldSongs.keys():
@@ -578,7 +568,8 @@ async def WaitAndDelete(event, FilePath, ServerProfile):
             ServerProfile.InterruptedByHerald = False
 
 #@asyncio.to_thread
-async def HeraldRestore(guildID):
+#async def HeraldRestore(guildID):
+def HeraldRestore(guildID):
     for userID in ServerProfiles[guildID].HeraldSongs.keys():
         HeraldProfile = ServerProfiles[guildID].HeraldSongs[userID]
         try:
@@ -598,4 +589,38 @@ async def HeraldRestore(guildID):
 # Suppress the default configuration since we have our own
 # client.run(token, log_handler=None)
 if __name__ == "__main__":
+    print("About to run")
+    print("Looking for Herald Backup files")
+    for filename in os.listdir("HeraldBackups"):
+        #Download herald themes before connecting to discord
+        f = os.path.join("HeraldBackups", filename)
+        # checking if it is a file
+        if os.path.isfile(f) and os.path.splitext(f)[1] == ".json":
+            print(f)
+
+            with open(f, 'r') as backup:
+                print("File opened")
+                TempHeraldRestoration = json.load(backup)
+                print("Attempting to download")
+                try:
+                    for userID in TempHeraldRestoration.keys():
+                        print("Downloading " + TempHeraldRestoration[userID][2] + " for user with ID: " + userID)
+                        print(TempHeraldRestoration[userID][0])
+                        file = downloadHERALD(TempHeraldRestoration[userID][0], userID)
+                        print("Download successful.")
+                        TempHeraldRestoration[userID][1] = file[0]
+                        print(TempHeraldRestoration)
+
+                except Exception as e:
+                    print("Error with opening HeraldBackup JSON")
+                    print(e)
+
+            with open(f, 'w') as backup:
+                try:
+                    # Write updated file locations to the backup JSON file
+                    json.dump(TempHeraldRestoration, backup)  # Write new file locations to the backup
+                except Exception as e:
+                    print("Error with writing to HeraldBackup JSON")
+                    print(e)
+
     bot.run(token)
