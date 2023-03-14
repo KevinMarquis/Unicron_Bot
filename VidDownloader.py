@@ -2,11 +2,12 @@
 from pytube import YouTube
 import os
 
-def download(url):
+async def download(url):
     """Downloads the video at the passed url.  Returns a tuple containing the file path and video name."""
     yt = YouTube(str(url))
+    print("Beginning Stream Search...")
     video = yt.streams.filter(only_audio=True).first()
-
+    print("Found Stream")
     Folder = "MusicQueue"
     # Check whether the specified path exists or not
     if not os.path.exists(Folder):
@@ -16,7 +17,9 @@ def download(url):
     destination = Folder
 
     # download the file
+    print("Beginning Download")
     out_file = video.download(output_path=destination)
+    print("Download Complete")
 
     # save the file
     base, ext = os.path.splitext(out_file)

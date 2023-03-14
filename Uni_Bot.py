@@ -131,6 +131,7 @@ class Guild_Profile():
         self.CurrentMusicStartTime = None # This is used to track the current timestamp of the song playing so that it can resume properly when interrupted by Herald
         self.InterruptedByHerald = False
         self.LazyDeleteSongs = []  # A list of songs to delete when the bot leaves voice that were put on hold due to Herald.
+        self.CurrentSongFile = None
 
     def __str__(self):
         """Creates a readble format to see the Guild Profile Data"""
@@ -203,6 +204,7 @@ async def on_voice_state_update(user, before, after):
                 await asyncio.sleep(1)
 
             print("Done Waiting")
+            ThisServerProfile.vc.pause()
             print("PlayingNow: ", ThisServerProfile.playingNOW)
 
             if ThisServerProfile.playingNOW:
@@ -519,7 +521,11 @@ async def PlayQ(ctx, voice):
         if not ThisServerProfile.InterruptedByHerald:  # If we're interrupted by Herald, we want to keep looping without doing anything until the flag is lowered.
             ThisServerProfile.PlayingEvent.clear()
             Current = ThisServerProfile.MusicQueue.get()  # Pop a song from the queue
-            file = download(Current[1])  # Download the song that was linked.
+
+            #file = download(Current[1])  # Download the song that was linked.
+            await DownloadSong(ctx.message.guild.id, Current[1])
+            file = ThisServerProfile.CurrentSongFile
+
             CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
             ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
             waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath, ThisServerProfile))
@@ -567,18 +573,9 @@ async def WaitAndDelete(event, FilePath, ServerProfile):
             ServerProfile.LazyDeleteSongs.append(FilePath)
             ServerProfile.InterruptedByHerald = False
 
-#@asyncio.to_thread
-#async def HeraldRestore(guildID):
-def HeraldRestore(guildID):
-    for userID in ServerProfiles[guildID].HeraldSongs.keys():
-        HeraldProfile = ServerProfiles[guildID].HeraldSongs[userID]
-        try:
-            File = downloadHERALD(HeraldProfile[0], userID)
-            HeraldProfile[1] = File[0]
-            HeraldProfile[2] = File[1]
-        except Exception as e:
-            print("ERROR in Restoring Herald Profile for USER ID: ", userID)
-            print(e)
+async def DownloadSong(GuildID, url):
+    ThisServerProfile = ServerProfiles[GuildID]
+    ThisServerProfile.CurrentSongFile = await download(url)
 
 
 
