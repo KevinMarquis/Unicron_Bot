@@ -10,116 +10,222 @@ import Token
 import os
 import json
 import time
+import Unicron_Image
 
-# region ERROR LOGGING
-"""ERROR LOGGING"""
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-logging.getLogger('discord.http').setLevel(logging.INFO)
+# region Constants
+INTENTS = discord.Intents.default()  # Set bot permissions.
+INTENTS.message_content = True  # This may need to be commented out for linux <^
+TOKEN = Token.HiddenToken  # Pull the token from another file.
+SERVER_PROFILES = dict()  # Initializes a dictionary with server ids as keys to another dictionary.
+SERVER_PREFIXES = dict()  # Initializes a dictionary with server ids as keys to the command prefix for that server.
+CWD = os.getcwd()
 
-handler = logging.handlers.RotatingFileHandler(
-    filename='discord.log',
-    encoding='utf-8',
-    maxBytes=32 * 1024 * 1024,  # 32 MiB
-    backupCount=5,  # Rotate through 5 files
-)
-dt_fmt = '%Y-%m-%d %H:%M:%S'
-formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+# WINDOWS:
+# You may need to change these filepaths
+FFMPEG_PCM_AUDIO_FILEPATH = os.path.join(CWD, "ffmpeg-2022-10-27-git-00b03331a0-full_build", "bin", "ffmpeg.exe")
+# RASBIAN/LINUX:
+# FFMPEG_PCM_AUDIO_FILEPATH = os.path.join("/usr", "bin", "ffmpeg")
 # endregion
 
-# region Setup
-intents = discord.Intents.default()  # Set bot permissions.
-intents.message_content = True
-#This may need to be commented out for linux ^
 
-token = Token.HiddenToken  # Pull the token from another file.
-ServerProfiles = dict()  # Initializes a dictionary with server ids as keys to another dictionary, with particular data.
-ServerPrefixes = dict()  # Initializes a dictionary with server ids as keys to the command prefix for that server.
-CWD = os.getcwd()
-FFmpegPCMAudio_FilePath = os.path.join(CWD, "ffmpeg-2022-10-27-git-00b03331a0-full_build", "bin", "ffmpeg.exe")  #WINDOWS
-#FFmpegPCMAudio_FilePath = os.path.join("/usr", "bin", "ffmpeg")  # RASBIAN/LINUX
-
+# region Util
 def get_prefix(client, message):
-    global ServerPrefixes
-    if message.guild.id in ServerPrefixes:  # Checks for a custom prefix
-        return ServerPrefixes[message.guild.id]
+    """Returns the prefix for the bot to use.
+
+    If the server has a prefix set in its profile, returns that value.
+    Otherwise, defaults to "!".  This function is called only by the discord.py API.
+
+    Args:
+        client: Client object for the bot.
+        message: Automatically filled in by the discord API.
+
+    Returns:
+        A string containing the prefix for the bot to use for the target channel.
+    """
+    global SERVER_PREFIXES
+    if message.guild.id in SERVER_PREFIXES:  # Checks for a custom prefix
+        return SERVER_PREFIXES[message.guild.id]
     else:
         return "!"  # Default Prefix
 
 
-bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
-client = discord.Client(intents=intents)
+# region Music Utils
+async def download_song(guild_id, url):
+    """Downloads a song to be played.
+
+    Downloads a song and writes the song filepath to the server profile object.
+
+    Args:
+        guild_id: ID number corresponding to the guild being accessed.
+        url: URL of the song to be downloaded and played on this guild.
+    """
+    ThisServerProfile = SERVER_PROFILES[guild_id]
+    ThisServerProfile.CurrentSongFile = await download(url)
 
 
+def calculate_time_stamp(seconds):
+    """Converts a timestamp in seconds to the format HH:MM:SS.MS.
+
+    Args:
+        seconds: an integer containing the timestamp in seconds.
+
+    Returns:
+        Timestamp string in the desired format.
+    """
+    if seconds < 362439:  # This is the number of seconds equal to 99:99:99.00 in HH:MM:SS.MS
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = seconds % 60
+        timestamp_code = str(hours) + ":" + str(minutes) + ":" + str(seconds) + ".00"
+        return timestamp_code
+    else:
+        return "99:99:99.00"
+
+
+async def wait_and_delete(event, filepath, server_profile):
+    """Deletes a song file once it has finished playing in voicechat.
+
+    Uses an asyncio event object to be called after a song finishes playing
+    Should only be called with asyncio create_task.
+
+    Args:
+        event: Asyncio event object that is tied to a task.
+        filepath: File path for the song currently playing.
+        server_profile: Server profile object for the server currently being accessed.
+    """
+    await event.wait()
+    bot_logger.debug("Finished Playing.")
+    bot_logger.debug(f"Skipping now: {server_profile.SkippingNow}")
+    if not server_profile.SkippingNow:
+        if not server_profile.InterruptedByHerald:
+            bot_logger.debug("Deleting file and moving to next song:")
+            os.remove(filepath)
+        else:
+            bot_logger.debug("Interrupted by Herald. Adding song to lazy delete list to be cleared when leaving VC.")
+            server_profile.LazyDeleteSongs.append(filepath)
+            server_profile.InterruptedByHerald = False
+# endregion
+# endregion
+
+
+# region ERROR LOGGING
+dt_fmt = '%Y-%m-%d %H:%M:%S'
+formatter = logging.Formatter('{asctime} {levelname} {name}: {message}', dt_fmt, style='{')
+
+# Set up loggers
+discord_logger = logging.getLogger('discord')
+discord_logger.setLevel(logging.DEBUG)
+logging.getLogger('discord.http').setLevel(logging.INFO)
+bot_logger = logging.getLogger('unicron')
+bot_logger.setLevel(logging.DEBUG)
+
+# Send output to Console (Warning and up only)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.WARNING)
+console_handler.setFormatter(formatter)
+
+# Create Handler to output log to files
+file_handler = logging.handlers.TimedRotatingFileHandler(filename='Unicron_Testing.log',
+                                                         encoding='utf-8',
+                                                         when='midnight',
+                                                         backupCount=7,
+                                                         utc=True)
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.DEBUG)
+
+bot_logger.addHandler(console_handler)
+bot_logger.addHandler(file_handler)
+discord_logger.addHandler(console_handler)
+discord_logger.addHandler(file_handler)
+bot_logger.propogate = False
+discord_logger = False
+# endregion
+
+bot = commands.Bot(command_prefix=get_prefix, intents=INTENTS, case_insensitive=True)
+client = discord.Client(intents=INTENTS)
+
+
+# region Join Setup
 @bot.event
 async def on_ready():
-    """Debug Event: Triggers when bot is online."""
+    """Triggers when the bot is online and restores server profiles.
 
-    print(f'We have logged in as {bot.user}')
+    Opens up server JSON files and extracts settings, including Herald profiles
+    and server settings.
+    """
 
-    global ServerProfiles
-    global ServerPrefixes
+    bot_logger.info(f'We have logged in as {bot.user}')
+
+    global SERVER_PROFILES
+    global SERVER_PREFIXES
 
     if not os.path.exists("Backups"):
         os.makedirs("Backups")
     BackupFile = os.path.join("Backups", "Prefixes.json")
     if os.path.exists(BackupFile):
-        print("Restoring Custom Prefixes")
+        bot_logger.debug("Restoring Custom Prefixes")
         with open(BackupFile, "r") as PrefixBackup:
-            ServerPrefixes = json.load(PrefixBackup)
+            SERVER_PREFIXES = json.load(PrefixBackup)
 
         NewServerPrefixDict = {}
-        for OldKey in ServerPrefixes.keys():
+        for OldKey in SERVER_PREFIXES.keys():
             try:
                 NewKey = int(OldKey)
-                NewServerPrefixDict[NewKey] = ServerPrefixes[OldKey]
+                NewServerPrefixDict[NewKey] = SERVER_PREFIXES[OldKey]
             except ValueError:
-                print("Error in adapting Prefixes from JSON.")
-        ServerPrefixes = NewServerPrefixDict
+                bot_logger.error("Error in adapting Prefixes from JSON.")
+        SERVER_PREFIXES = NewServerPrefixDict
 
-
-    print("Setting up Guild Profiles")
+    bot_logger.info("Setting up Guild Profiles")
     for guild in bot.guilds:
-        ServerProfiles[guild.id] = Guild_Profile(guild)
-        print("\nThis server has ID and Name: ")
-        print(guild.id)
-        print(guild.name)
+        SERVER_PROFILES[guild.id] = Guild_Profile(guild)
+        bot_logger.debug(f"This server has ID {guild.id} and Name: {guild.name}")
 
         BackupFileName = str(guild.id) + ".json"
         BackupFolder = os.path.join("HeraldBackups", BackupFileName)
         if os.path.exists(BackupFolder):
             with open(BackupFolder, 'r') as backup:
-                ServerProfiles[guild.id].HeraldSongs = json.load(backup)
-                print("Retreived Herald Profiles!")
+                SERVER_PROFILES[guild.id].HeraldSongs = json.load(backup)
+                bot_logger.debug("Retreived Herald Profiles!")
 
                 # We've already downloaded the Herald videos, so we just need to load the dictionaries
 
             newHeraldProfileDict = {}
-            for OldKey in ServerProfiles[guild.id].HeraldSongs.keys():
+            for OldKey in SERVER_PROFILES[guild.id].HeraldSongs.keys():
                 try:
                     NewKey = int(OldKey)
-                    newHeraldProfileDict[NewKey] = ServerProfiles[guild.id].HeraldSongs[OldKey]
+                    newHeraldProfileDict[NewKey] = SERVER_PROFILES[guild.id].HeraldSongs[OldKey]
                 except ValueError:
-                    print("Error in adapting HeraldSongs from JSON.")
-            ServerProfiles[guild.id].HeraldSongs = newHeraldProfileDict
-    print("SETUP ENDED.  READY TO OPERATE.")
+                    bot_logger.error("Error in adapting HeraldSongs from JSON.")
+            SERVER_PROFILES[guild.id].HeraldSongs = newHeraldProfileDict
+    bot_logger.info("SETUP ENDED. READY TO OPERATE.")
+    print(Unicron_Image.UNICRON_IMAGE)
+    print("---------UNICRON IS ONLINE---------")
 
 
 @bot.event
 async def on_guild_join(guild):
-    print("This server has ID and Name: ")
-    print(guild.id)
-    print(guild.name + "\n")
-    ServerProfiles[guild.id] = Guild_Profile(guild)
+    """Event that triggers when the bot joins a new guild.
+
+    Writes out data to the log.
+    """
+    bot_logger.info(f"Joined Server with ID {guild.id} and name {guild.name}")
+    SERVER_PROFILES[guild.id] = Guild_Profile(guild)
 
 
 # endregion
 
 class Guild_Profile():
-    def __init__(self, Guild):
-        self.Guild = Guild
+    def __init__(self, guild):
+        """Initializes a new Guild Profile object.
+
+        Args:
+            guild: Discord API Guild object (for a server).
+
+        Returns:
+            None
+        """
+        self.Guild = guild
         self.HeraldSongs = dict()  # Initialize a dictionary for Herald profiles
         self.MusicQueue = queue.Queue()
         self.successful_join = False
@@ -128,13 +234,20 @@ class Guild_Profile():
         self.PlayingEvent = asyncio.Event()
         self.CurrentSong = (None, None)  # (Filepath, URL)
         self.SkippingNow = False  # Note that this variable is only used for the purposes of JumpTo
-        self.CurrentMusicStartTime = None # This is used to track the current timestamp of the song playing so that it can resume properly when interrupted by Herald
+        self.CurrentMusicStartTime = None  # Used to track the current timestamp of the song playing so that it can
+                                           # resume properly when interrupted by Herald
         self.InterruptedByHerald = False
-        self.LazyDeleteSongs = []  # A list of songs to delete when the bot leaves voice that were put on hold due to Herald.
+        self.LazyDeleteSongs = []  # List of songs to delete when the bot leaves vc that were put on hold due to Herald.
         self.CurrentSongFile = None
 
     def __str__(self):
-        """Creates a readble format to see the Guild Profile Data"""
+        """Creates a readable string format to read the Guild Profile Data.
+
+        This function is used solely for debug/logging.
+
+        Returns:
+            String representation of the Guild Profile.
+        """
         StringtoReturn = ""
         StringtoReturn += "\n\n--------------------------"
         StringtoReturn += "\nSERVER PROFILE FOR: " + self.Guild.name
@@ -153,470 +266,526 @@ class Guild_Profile():
         return StringtoReturn
 
 
-# region Help Setup
-class MyHelpCommand(commands.MinimalHelpCommand):
-    async def send_pages(self):
-        destination = self.get_destination()
-        e = discord.Embed(color=discord.Color.blurple(), description='')
-        for page in self.paginator.pages:
-            e.description += page
-        await destination.send(embed=e)
-
-
-bot.help_command = MyHelpCommand()
-
-
-# endregion
-
 # region Herald Functionality
 @bot.event
 async def on_voice_state_update(user, before, after):
-    """Triggers Herald Theme.  Awaits user to join voice and plays audio clip if user has set one."""
-    global FFmpegPCMAudio_FilePath
-    global ServerProfiles
+    """Bot event that triggers the Herald theme to play upon joining voice chat.
+
+    Function triggered as an event that will play the herald theme in chat.
+    Whenever a user that has created a herald profile on the server joins
+    the voice chat, Unicron will join the server, play their short Herald
+    theme and leave the chat. This function should not be called directly.
+    Instead, it should exclusively be called by the discord API.
+
+    Args:
+        user: The user object for the user whose voice status was updated.
+        before: The voice channel the user had previously been in (if any).
+        after: The voice channel the user is now in (if any).
+    """
+    global FFMPEG_PCM_AUDIO_FILEPATH
+    global SERVER_PROFILES
     if before.channel is None and after.channel is not None:
         # User has connected to a VoiceChannel
         channel = after.channel
-        ThisServerProfile = ServerProfiles[after.channel.guild.id]
+        target_serv_prof = SERVER_PROFILES[after.channel.guild.id]
 
-        if user.id in ThisServerProfile.HeraldSongs.keys():
-            print("Heralding " + user.name + " on Guild " + ThisServerProfile.Guild.name)
+        if user.id in target_serv_prof.HeraldSongs.keys():
+            bot_logger.info(f"Heralding {user.name} on Guild {target_serv_prof.Guild.name}")
             channel = user.voice.channel  # Note the channel to play music in
-            RestoreTime = ThisServerProfile.CurrentMusicStartTime
+            RestoreTime = target_serv_prof.CurrentMusicStartTime
 
-            if ThisServerProfile.playingNOW:
-                ThisServerProfile.InterruptedByHerald = True
-                RestoreTime = int(time.time() - ThisServerProfile.CurrentMusicStartTime)
-                print(RestoreTime)
-                ThisServerProfile.vc.pause()  # Pauses music if any is playing currently.
+            if target_serv_prof.playingNOW:  # Pauses music if any is playing currently.
+                target_serv_prof.InterruptedByHerald = True
+                RestoreTime = int(time.time() - target_serv_prof.CurrentMusicStartTime)
+                bot_logger.info(f"Herald Restore Time: {RestoreTime}")
+                target_serv_prof.vc.pause()
 
-            if not ThisServerProfile.successful_join: #ThisServerProfile.vc.is_connected():
-                ThisServerProfile.vc = await channel.connect()
-                ThisServerProfile.successful_join = True
-            ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=ThisServerProfile.HeraldSongs[user.id][1], before_options="-ss " + ThisServerProfile.HeraldSongs[user.id][3]), after=lambda e: print("Done playing for user " + user.name + "."))
+            if not target_serv_prof.successful_join:
+                target_serv_prof.vc = await channel.connect()
+                target_serv_prof.successful_join = True
+
+            target_serv_prof.vc.play(FFmpegPCMAudio(executable=FFMPEG_PCM_AUDIO_FILEPATH,
+                                                    source=target_serv_prof.HeraldSongs[user.id][1],
+                                                    before_options="-ss " + target_serv_prof.HeraldSongs[user.id][3]),
+                                     after=lambda e: bot_logger.info(f"Done playing for user {user.name}."))
 
             start = time.time()  # Check the starttime so we can only play for 15s or less.
             elapsed = 0
 
-            while elapsed < ThisServerProfile.HeraldSongs[user.id][5]:  # Sleep while the video plays for 15 Seconds
-                print("Waiting for Herald to finish...", elapsed)
+            while elapsed < target_serv_prof.HeraldSongs[user.id][5]:  # Sleep while the video plays for 15 Seconds
+                bot_logger.debug(f"Waiting for Herald to finish...{elapsed}")
                 elapsed = time.time() - start
                 await asyncio.sleep(1)
 
-            print("Done Waiting")
-            ThisServerProfile.vc.pause()
-            print("PlayingNow: ", ThisServerProfile.playingNOW)
+            bot_logger.debug("Done Waiting for Herald")
+            target_serv_prof.vc.pause()
+            bot_logger.debug(f"PlayingNow: {target_serv_prof.playingNOW}")
 
-            if ThisServerProfile.playingNOW:
-                print("Resuming Music")
-                Timestamp = CalculateTimeStamp(RestoreTime)
-                ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=ThisServerProfile.CurrentSong[0], before_options="-ss " + Timestamp), after=lambda e: ThisServerProfile.PlayingEvent.set())
+            if target_serv_prof.playingNOW:
+                bot_logger.info("Resuming Music")
+                Timestamp = calculate_time_stamp(RestoreTime)
+                target_serv_prof.vc.play(FFmpegPCMAudio(executable=FFMPEG_PCM_AUDIO_FILEPATH,
+                                                        source=target_serv_prof.CurrentSong[0],
+                                                        before_options="-ss " + Timestamp),
+                                         after=lambda e: target_serv_prof.PlayingEvent.set())
             else:
-                #await HeraldVC.disconnect()
-                await ThisServerProfile.vc.disconnect()
+                await target_serv_prof.vc.disconnect()
 
                 # Reset Server variables
-                ThisServerProfile.successful_join = False
-                ThisServerProfile.vc = None
-                ThisServerProfile.PlayingNOW = False
-                ThisServerProfile.PlayingEvent.clear()
+                target_serv_prof.successful_join = False
+                target_serv_prof.vc = None
+                target_serv_prof.PlayingNOW = False
+                target_serv_prof.PlayingEvent.clear()
     elif before.channel is not None and after.channel is None:
-            # Indicates someone leaving voice chat.
-            if user.id == 1035362429758083072: # This is the bot's id.  So, if the bot disconnects from voice
-                ThisServerProfile = ServerProfiles[before.channel.guild.id]
+        # Indicates someone leaving voice chat.
+        if user.id == 1035362429758083072:  # This is the bot's id. => if the bot disconnects from voice
+            target_serv_prof = SERVER_PROFILES[before.channel.guild.id]
+            try:
+                if target_serv_prof.vc:
+                    target_serv_prof.vc.stop()
+            except Exception as e:
+                bot_logger.error("Error: Failed to properly stop voice when disconnecting.")
+                bot_logger.debug(e)
+            for filepath in target_serv_prof.LazyDeleteSongs:  # delete all lazy delete songs
                 try:
-                    if ThisServerProfile.vc:
-                        ThisServerProfile.vc.stop()
+                    bot_logger.debug("Clearing Lazy Delete List.")
+                    os.remove(filepath)
                 except Exception as e:
-                    print("Error: Failed to properly stop voice when disconnecting.")
-                    print(e)
-                for filepath in ThisServerProfile.LazyDeleteSongs:  # delete all lazy delete songs
-                    try:
-                        os.remove(filepath)
-                    except Exception as e:
-                        print("Error: Failed to remove song with filepath: " + filepath)
-                        print(e)
-
+                    bot_logger.warning("Error: Failed to remove song with filepath: " + filepath)
+                    bot_logger.debug(e)
 
 
 @bot.command(name="HeraldSet",
-             description="Sets up a herald bot profile.  Provide a short YouTube URL to play every time you join voice.  "
-                         "Provide a url and timestamp (in seconds) and a 15 second clip starting from that timestamp will be saved.")
-async def HeraldSet(ctx, url, StartTime=0):
-    """Sets the Herald Theme for the user."""
-    print("HeraldSet Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    # Initialize global variables
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    HeraldUser = ctx.author
-    HeraldKey = HeraldUser.id  # Takes the user's id.  This will be used as the key for the dictionary.
-    if HeraldKey in ThisServerProfile.HeraldSongs:
-        os.remove(ThisServerProfile.HeraldSongs[HeraldKey][1])
+             description="Sets up a herald profile. Provide a short YouTube URL to play every time you join voice.\n"
+                         "Provide a url and timestamp (in seconds) and a 15s clip starting from the time will be saved")
+async def herald_set(ctx, url, start_time=0):
+    """This function sets a Herald Theme for the user.
 
-    EndTime = StartTime  # Initialize variable EndTime
-    HeraldVideo = YouTube(str(url))
-    if HeraldVideo.length - StartTime < 15:  # Check if the video clip is less than 15 seconds
-        EndTime = HeraldVideo.length  # If it is, allow the Herald Clip to be less than 15 seconds
-    elif HeraldVideo.length - StartTime >= 15:  # If the remainder of the video after the timestamp is greater than 15 seconds,
-        EndTime = StartTime + 15  # Just take the 15 seconds after the provided timestamp.  If no timestamp was given, this is just the first 15 seconds.
+    User-accessible command that sets the herald theme for the user.
+    If the user previously had a herald theme, the old theme is overwritten.
+    After saving the audio file, the JSON file is written to in order to backup the
+    new Herald theme, in the event that the bot resets.
+
+    Args:
+        ctx: Discord API context object for the caller
+        url: URL to the YouTube video that is to be set as the HeraldTheme.
+        start_time: Integer. Time in seconds for the theme to start at.
+    """
+    bot_logger.debug(f"HeraldSet CMD received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    # Initialize global variables
+    global SERVER_PROFILES
+    this_srv_prof = SERVER_PROFILES[ctx.message.guild.id]
+    hrld_usr = ctx.author
+    hrld_key = hrld_usr.id  # Takes the user's id.  This will be used as the key for the dictionary.
+    if hrld_key in this_srv_prof.HeraldSongs:
+        os.remove(this_srv_prof.HeraldSongs[hrld_key][1])
+
+    end_time = start_time  # Initialize variable EndTime
+    hrld_vid = YouTube(str(url))
+    if hrld_vid.length - start_time < 15:  # Check if the video clip is less than 15 seconds
+        end_time = hrld_vid.length  # If it is, allow the Herald Clip to be less than 15 seconds
+    elif hrld_vid.length - start_time >= 15:  # If the remainder of the video after the timestamp is greater than 15s,
+        end_time = start_time + 15  # If no timestamp was given, this is just the first 15 seconds.
 
     try:
-        file = downloadHERALD(url, HeraldKey)  # Returns tuple containing the filepath and file name
-    except:
+        file = downloadHERALD(url, hrld_key)  # Returns tuple containing the filepath and file name
+    except Exception as e:
         await ctx.send("ERROR: Herald Theme download failed.")
-        print("ERROR: Herald Theme download failed.")
+        bot_logger.error(f"ERROR: Herald Theme download failed for user {ctx.message.author.name}.")
+        bot_logger.debug(e)
 
-    StartTimeStampCode = CalculateTimeStamp(StartTime)
-    print("Starting Timestamp for user " + HeraldUser.name + ":", StartTimeStampCode)
-    EndTimeStampCode = CalculateTimeStamp(EndTime)
-    print("Starting Timestamp for user " + HeraldUser.name + ":", EndTimeStampCode)
-    ThisServerProfile.HeraldSongs[HeraldKey] = (url, file[0], file[1], StartTimeStampCode, EndTimeStampCode, EndTime)  # Stores the file as a tuple: URL (backup), filepath, file name, StartTime, EndTime
+    start_timestamp_code = calculate_time_stamp(start_time)
+    bot_logger.info(f"Starting Timestamp for user {hrld_usr.name}: {start_timestamp_code}")
+    end_timestamp_code = calculate_time_stamp(end_time)
+    bot_logger.info(f"Ending Timestamp for user {hrld_usr.name}: {end_timestamp_code}")
+    # Stores the file as a tuple: URL (backup), filepath, file name, StartTime, EndTime
+    this_srv_prof.HeraldSongs[hrld_key] = (url, file[0], file[1], start_timestamp_code, end_timestamp_code, end_time)
 
-    userMentionTag = HeraldUser.mention
-    print("Success!  Herald theme for " + HeraldUser.name + " has been changed to: " +
-          ThisServerProfile.HeraldSongs[HeraldKey][2])
-    await ctx.send(userMentionTag + "Success!  Your Herald theme has been changed to: " + ThisServerProfile.HeraldSongs[HeraldKey][2])
+    usr_mention = hrld_usr.mention
+    herald_theme = this_srv_prof.HeraldSongs[hrld_key][2]
+    await ctx.send(f"{usr_mention} Success! Your Herald theme has been changed to: {herald_theme}")
+    bot_logger.info(f"{usr_mention} Herald theme has been changed to: {herald_theme}")
 
+    # Back up new herald theme
     if not os.path.exists("HeraldBackups"):
         os.makedirs("HeraldBackups")
-    BackupFile = "HeraldBackups/" + str(ThisServerProfile.Guild.id) + ".json"
-    with open(BackupFile, "w") as outfile:
-        json.dump(ThisServerProfile.HeraldSongs, outfile)
+    backup_file = "HeraldBackups/" + str(this_srv_prof.Guild.id) + ".json"
+    with open(backup_file, "w") as outfile:
+        json.dump(this_srv_prof.HeraldSongs, outfile)
 
 
 @bot.command(name="HeraldTheme", description="Returns the user's herald theme.")
-async def HeraldTheme(ctx):
-    """Returns the user's Herald Theme if one is set."""
-    print("HeraldTheme Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+async def herald_theme(ctx):
+    """Replies with the user's Herald theme if one is set.
+
+    User-accessible command that replies with the HeraldTheme they set (if any).
+
+    Args:
+        ctx: Discord API context object for the sender of the command.
+    """
+    bot_logger.info(f"HeraldTheme CMD Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    global SERVER_PROFILES
+    this_srv_prof = SERVER_PROFILES[ctx.message.guild.id]
     try:
-        print("HeraldTheme Printout for Server" + ThisServerProfile.Guild.name + "\n", ThisServerProfile.HeraldSongs)
-        HeraldID = ctx.author.id
-        userMentionTag = ctx.author.mention
-        if HeraldID in ThisServerProfile.HeraldSongs.keys():
-            print("Herald theme for user " + ctx.author.name + " is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
-            await ctx.send(userMentionTag + "Your Herald theme is: " + ThisServerProfile.HeraldSongs[HeraldID][2] + ", LINK: " + ThisServerProfile.HeraldSongs[HeraldID][0])
+        bot_logger.info(f"HeraldThemes for Server {this_srv_prof.Guild.name}: {this_srv_prof.HeraldSongs}")
+        hrld_id = ctx.author.id
+        usr_mention = ctx.author.mention
+        if hrld_id in this_srv_prof.HeraldSongs.keys():
+            await ctx.send(usr_mention + "Your Herald theme is: " + this_srv_prof.HeraldSongs[hrld_id][2] +
+                           ", LINK: " + this_srv_prof.HeraldSongs[hrld_id][0])
+            bot_logger.info(f"Released Herald Theme for user {ctx.author.name}.")
+
         else:
-            await ctx.send(
-                userMentionTag + "You do not have a Herald theme set.  To set one use the HeraldSet command, along with a link to a short youtube video.")
+            await ctx.send(usr_mention + ("You do not have a Herald theme set. To set one, use the HeraldSet command, "
+                                          "along with a link to a short YouTube video."))
 
     except Exception as e:
         await ctx.send("ERROR: HERALD THEME CHECK FAILED.")
-        print("ERROR: HERALD THEME CHECK FAILED.")
-        print(e)
-
-
+        bot_logger.error("ERROR: HERALD THEME CHECK FAILED.")
+        bot_logger.debug(e)
 # endregion
+
 
 # region Generic Commands
 @bot.command(name="Hello", description="Tags the user to greet them.")
 async def hello(ctx):
-    """Tags the user to greet them."""
+    """Command that greets a user in discord text chat.
+
+    User-accessible command that messages a user a hello message.
+    This command is primarily used for verifying that the bot is online.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
     await ctx.send(ctx.author.mention + " hello!")
+    bot_logger.info(f"Greeted user {ctx.author} with a hello message")
 
 
 @bot.command(name="prefix_change", description="Changes the command prefix to the given parameter")
 async def pref_change(ctx, new_pref):
-    """Changes the command prefix to the given parameter"""
-    print("Prefix Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
+    """Command that changes the command prefix for the server.
 
-    global ServerPrefixes
-    ServerPrefixes[ctx.message.guild.id] = new_pref  # Creates/changes entry in dictionary
+    User-accessible command that changes the command prefix for the current server context.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+        new_pref: String containing the new prefix to be prepended before all commands.
+    """
+    bot_logger.debug(f"Prefix Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+
+    global SERVER_PREFIXES
+    SERVER_PREFIXES[ctx.message.guild.id] = new_pref  # Creates/changes entry in dictionary
     await ctx.send("Prefix has been set to: " + new_pref)
+    bot_logger.info(f"Prefix for guild with ID {ctx.message.guild.id} has been set to: {new_pref}")
 
     with open("Backups/Prefixes.json", "w") as outfile:  # Backs up the custom prefix
-        json.dump(ServerPrefixes, outfile)
-
-
+        json.dump(SERVER_PREFIXES, outfile)
+        bot_logger.debug("Backed up new custom prefix.")
 # endregion
 
+
 # region Voice_Channel_Commands
+@bot.command(name="Jump", description="If a song is currently playing, jumps to the given timestamp (in seconds).")
+async def jump_to(ctx, timestamp):
+    """Command that fast forwards or rewinds the currently playing song to a given timestamp.
 
-@bot.command(name="JumpTo", description="If a song is currently playing, jumps to the given timestamp (in seconds).")
-async def JumpTo(ctx, TimeStamp):
-    """If a song is currently playing, jumps to the given timestamp."""
-    global FFmpegPCMAudio_FilePath
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+    User-accessible command that will set the timestamp for the currently playing song to the user provided
+    time in seconds.
 
-    print("Received JumpTo Command (" + TimeStamp + "s)")
-    if ThisServerProfile.playingNOW:
-        CurrentVideo = YouTube(ThisServerProfile.CurrentSong[1])  # Make sure this is actually url
-        if int(TimeStamp) < CurrentVideo.length:
-            SongToDelete = ThisServerProfile.CurrentSong[0]  # Note down the filepath so we can remove it.
-            ThisServerProfile.SkippingNow = True
-            ThisServerProfile.vc.stop()
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+        timestamp: Integer containing the timestamp in seconds.
+    """
+    global FFMPEG_PCM_AUDIO_FILEPATH
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
 
-            JumpVideoEvent = asyncio.Event()
-            STARTTimestampCode = CalculateTimeStamp(int(TimeStamp))  # Convert timestamp code to version FFMPEG can use.  Easier to do this than sanitize timestamp inputs.
-            waiter_task = asyncio.create_task(WaitAndDelete(JumpVideoEvent, SongToDelete, ThisServerProfile))
+    bot_logger.debug("Received JumpTo Command (" + timestamp + "s)")
+    if this_server_profile.playingNOW:
+        current_video = YouTube(this_server_profile.CurrentSong[1])  # Make sure this is actually url
+        if int(timestamp) < current_video.length:
+            song_to_delete = this_server_profile.CurrentSong[0]  # Note down the filepath so we can remove it.
+            this_server_profile.SkippingNow = True
+            this_server_profile.vc.stop()
 
-            ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath,source=ThisServerProfile.CurrentSong[0], before_options="-ss " + STARTTimestampCode), after=lambda e: JumpVideoEvent.set())
+            jump_video_event = asyncio.Event()
+            start_timestamp_code = calculate_time_stamp(int(timestamp))  # Convert timestamp to version FFMPEG can use.
+            waiter_task = asyncio.create_task(wait_and_delete(jump_video_event, song_to_delete, this_server_profile))
 
-            await ctx.send("Skipped to " + STARTTimestampCode)
-            print("Skipped to " + STARTTimestampCode)
+            this_server_profile.vc.play(FFmpegPCMAudio(executable=FFMPEG_PCM_AUDIO_FILEPATH,
+                                                       source=this_server_profile.CurrentSong[0],
+                                                       before_options="-ss " + start_timestamp_code),
+                                        after=lambda e: jump_video_event.set())
+
+            await ctx.send("Skipped to " + start_timestamp_code)
+            bot_logger.info("Skipped to " + start_timestamp_code)
             await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
-            os.remove(SongToDelete)  # Delete the file ourselves since we told the waiter task not to delete while we're fastforwarding
-            ThisServerProfile.SkippingNow = False
+            os.remove(song_to_delete)  # Delete the file since we told the waiter task not to delete when we fastforward
+            this_server_profile.SkippingNow = False
 
         else:
-            await ctx.send(ctx.author.mention + " Invalid timestamp.  Please select a timestamp less than the videolength (in seconds).")
+            await ctx.send(ctx.author.mention + " Invalid timestamp. Please select a valid time (in seconds).")
+            bot_logger.debug("Received jump Command with invalid timestamp.")
     else:
-        await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can Fastforward or JumpTo through it!")
+        await ctx.send(ctx.author.mention + " No audio playing. You'll need to play something before you can use Jump.")
+        bot_logger.debug("Received jump command, but no audio was playing in the voice channel.")
 
 
 @bot.command(name="Join", description="Summons Unicron to join the voice channel.")
 async def join(ctx):
-    """Bot joins the voice channel."""
-    global ServerProfiles
+    """Command that summons the bot to the voice channel the user is currently in.
 
-    print("Join Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+    User-accessible command that summons the bot to the current voice channel.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
+    global SERVER_PROFILES
+
+    bot_logger.debug(f"Join Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
 
     try:  # Checks if user is in a voice channel
         channel = ctx.author.voice.channel
-        if not ThisServerProfile.successful_join:
-            ThisServerProfile.vc = await channel.connect()
-            ThisServerProfile.successful_join = True
-    except:
+        if not this_server_profile.successful_join:
+            this_server_profile.vc = await channel.connect()
+            this_server_profile.successful_join = True
+    except Exception as e:
+        bot_logger.warning("Join Error: ", e)
         await ctx.send("User must be in a voice channel")
 
-    if ThisServerProfile.vc is None or not ThisServerProfile.vc.is_connected():  # Check that we aren't already in a voice channel before attempting to connect
-        print("\n\nJoining Guild: " + ctx.message.guild.name)
+    if this_server_profile.vc is None or not this_server_profile.vc.is_connected():  # Check that we aren't in vc
+        bot_logger.info(f"Joining Guild {ctx.message.guild.name}...")
         await ctx.author.voice.channel.connect()
-        ThisServerProfile.vc = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    return ThisServerProfile.vc
+        this_server_profile.vc = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        bot_logger.info("Successfully joined target Guild VC.")
+    return this_server_profile.vc
 
 
 @bot.command(name="Leave", description="Commands the bot to leave the voice channel.")
 async def leave(ctx):
-    """Bot leaves the voice channel."""
-    print("Leave Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    print(str(ThisServerProfile))
+    """Command that forces the bot to leave the voice channel.
 
-    if ThisServerProfile.playingNOW:  # Clear the queue out and stop the player.
-        ThisServerProfile.MusicQueue = queue.Queue()
-        if ThisServerProfile.vc:
-            ThisServerProfile.vc.stop()
+    User-accessible command that forces the bot to leave the current voice channel
+    in this server.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
+    bot_logger.debug(f"Leave Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
+    bot_logger.debug(str(this_server_profile))
+
+    if this_server_profile.playingNOW:  # Clear the queue out and stop the player.
+        this_server_profile.MusicQueue = queue.Queue()
+        if this_server_profile.vc:
+            this_server_profile.vc.stop()
 
     # Then we will disconnect.
-    await ThisServerProfile.vc.disconnect()
+    await this_server_profile.vc.disconnect()
+    bot_logger.info(f"Successfully left VC on guild {ctx.message.guild.name}")
 
     # Reset Server variables
-    ThisServerProfile.successful_join = False
-    ThisServerProfile.vc = None
-    ThisServerProfile.PlayingNOW = False
-    ThisServerProfile.PlayingEvent.clear()
+    this_server_profile.successful_join = False
+    this_server_profile.vc = None
+    this_server_profile.PlayingNOW = False
+    this_server_profile.PlayingEvent.clear()
 
 
-@bot.command(name="Pause", description="Pauses the audio, if any if playing.  Resume with Resume.")
+@bot.command(name="Pause", description="Pauses the audio, if any if playing. Resume with Resume.")
 async def pause(ctx):
-    """Pauses the audio, if any if playing.  Resume with Resume."""
-    print("Pause Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    if ThisServerProfile.playingNOW:
+    """Command that pauses the audio playing in the current voice channel, if any.
+
+    User-accessible command that pauses the audio playing in the current voice channel
+    if any is playing.  If no audio is playing, does nothing.  Paused audio can be resumed
+    with the resume command.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
+    bot_logger.debug(f"Pause Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
+    if this_server_profile.playingNOW:
         # Pause audio
-        ThisServerProfile.vc.pause()
+        this_server_profile.vc.pause()
+        bot_logger.info(f"Audio on guild {ctx.message.guild.name} has been paused successfully.")
     else:
         # Don't try to pause if not playing now.  We'll have a null pointer exception.
         await ctx.send(ctx.author.mention + " No audio playing.  Play something with command: Play")
+        bot_logger.debug("Pause command received but no audio is playing.")
 
 
 @bot.command(name="Resume", description="Resumes the audio if any was playing or paused.")
 async def resume(ctx):
-    """Resumes the audio if any was playing or paused."""
-    print("Resume Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    if ThisServerProfile.playingNOW:
-        ThisServerProfile.vc.resume()  # resumes music if any was playing.
+    """Command that plays the audio that was paused in the current voice channel, if any.
+
+    User-accessible command that plays the audio that is paused in the current voice channel, if any.
+    If no audio is paused, does nothing.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
+    bot_logger.debug(f"Resume Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
+    if this_server_profile.playingNOW:
+        this_server_profile.vc.resume()  # resumes music if any was playing.
+        bot_logger.info(f"Audio on guild {ctx.message.guild.name} has been resumed successfully.")
     else:
-        await ctx.send(
-            ctx.author.mention + " No audio playing.  Maybe you meant to play something with command: Play")
+        await ctx.send(ctx.author.mention + " No audio playing.  Maybe you meant to play something with command: Play")
+        bot_logger.debug("Resume command received but no audio is paused.")
 
 
 @bot.command(name="Skip", description="Skips the current song if any was playing.")
 async def skip_song(ctx):
-    """Skips the current song if any was playing."""
-    print("Skip Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    if ThisServerProfile.playingNOW:
-        ThisServerProfile.vc.stop()  # Stop, trigger waiter event to end and then proceed to next song (if one is there)
+    """Command that skips the audio track playing in the current voice channel, if any.
+
+    User-accessible command that skips the currently playing audio track in the voice channel
+    and moves to the next song in the queue.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
+    bot_logger.debug(f"Skip Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
+    if this_server_profile.playingNOW:
+        this_server_profile.vc.stop()  # Stop, trigger waiter event to end, then proceed to next song (if one is there)
+        bot_logger.info(f"Audio on guild {ctx.message.guild.name} has been skipped successfully.")
     else:
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can skip it!")
+        bot_logger.debug("Skip command received but no audio is playing.")
 
 
 @bot.command(name="Stop", description="Stops playing all audio and clears the queue.")
 async def stop_playing(ctx):
-    """Stops playing all audio and clears the queue."""
-    print("Stop Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    if ThisServerProfile.playingNOW:
-        ThisServerProfile.MusicQueue = queue.Queue()  # Clear out the queue
-        ThisServerProfile.vc.stop()  # Stop.  Nothing will play after since the queue is empty now.
-        ThisServerProfile.playingNOW = False  # Show that we aren't playing now.
+    """Command that stops the audio playing in the current voice channel, if any.
+
+    User-accessible command that stops any audo playing in the current voice channel
+    and clears the queue.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+    """
+    bot_logger.debug(f"Stop Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
+    if this_server_profile.playingNOW:
+        this_server_profile.MusicQueue = queue.Queue()  # Clear out the queue
+        this_server_profile.vc.stop()  # Stop.  Nothing will play after since the queue is empty now.
+        this_server_profile.playingNOW = False  # Show that we aren't playing now.
+        bot_logger.info(f"Audio on guild {ctx.message.guild.name} has been stopped successfully.")
     else:
-        print("Music not playing.  Current queue size: " + str(ThisServerProfile.MusicQueue.qsize()))
         await ctx.send(ctx.author.mention + " No audio playing.  You'll need to play something before you can stop it!")
+        bot_logger.debug("Stop command received but no audio is playing.")
+        bot_logger.debug(f"Current Queue Size: {this_server_profile.MusicQueue.qsize()}")
 
 
 @bot.command(name="Play", description="Adds a video to the music queue.")
-async def PlayEnqueue(ctx, url):
-    """Command that user interacts with.  Adds urls to a music queue which are popped and played by PlayQ"""
-    print("Enqueue Command Received from user " + ctx.message.author.name + " on Guild " + ctx.message.guild.name)
+async def play_enq(ctx, url):
+    """Command that adds an audio track the the queue, to be played in the current voice channel.
+
+    User-accessible command that adds a track with a given URL to the audio queue.  It will
+    be played in the current voice channel.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+        url: YouTube URL to the song that shall be played.
+    """
+    bot_logger.debug(f"Enqueue Command Received from user {ctx.message.author.name} on Guild {ctx.message.guild.name}")
     # Initialize global variables
-    global ServerProfiles
+    global SERVER_PROFILES
     try:  # Check that the command sender is in a voice channel.  If not, ignore the command.
-        UserVoiceChannel = ctx.author.voice.channel  # Looks up the user channel.  If this fails (except), then we throw out the command since the user is not in voice.
+        user_voice_chnl = ctx.author.voice.channel  # Looks up the user channel.  If this fails the user is not in vc.
     except Exception as e:
         await ctx.send("An exception occurred.  This may be because the user is not in the voice channel.")
-        print("An exception occurred.  This may be because the user is not in the voice channel.")
-        print(e)
+        bot_logger.warning("An exception occurred in enqueue. This may be because the user isn't in the voice channel.")
+        bot_logger.debug(e)
         return  # Throw out this command
 
     try:
-        ThisServerProfile = ServerProfiles[ctx.message.guild.id]
+        this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
 
         if "list" in str(url):  # Check if we're dealing with a pleylist
             p = Playlist(str(url))
-            await  ctx.send("Queueing up a playlist..." + p.title)
-            print("Queueing up a playlist..." + p.title)
+            await ctx.send("Queueing up a playlist..." + p.title)
+            bot_logger.debug("Queueing up a playlist..." + p.title)
             for vid in p.video_urls:
-                ThisServerProfile.MusicQueue.put((ctx, vid))
-                print("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
+                this_server_profile.MusicQueue.put((ctx, vid))
+                bot_logger.info(f"Enqueued: {str(vid.title)} at position {this_server_profile.MusicQueue.qsize()}")
         else:  # Not dealing with a playlist.  Just a single video.
-            ThisServerProfile.MusicQueue.put((ctx, url))  # Add song to queue
+            this_server_profile.MusicQueue.put((ctx, url))  # Add song to queue
             vid = YouTube(str(url))
-            await ctx.send("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
-            print("Enqueued: " + str(vid.title) + " at position " + str(ThisServerProfile.MusicQueue.qsize()))
+            await ctx.send(f"Enqueued: {str(vid.title)} at position {str(this_server_profile.MusicQueue.qsize())}.")
+            bot_logger.info(f"Enqueued: {str(vid.title)} at position {str(this_server_profile.MusicQueue.qsize())}.")
 
-        if not ThisServerProfile.successful_join:
+        if not this_server_profile.successful_join:
             # If we aren't already in voice for this server, then we can join
             await join(ctx)
 
-        if not ThisServerProfile.playingNOW:  # Check if we're playing right now.  If we are, no need to start up the queue.
-            await PlayQ(ctx, ThisServerProfile.vc)
+        if not this_server_profile.playingNOW:  # If we are playing, no need to start up the queue.
+            await play_deq(ctx, this_server_profile.vc)
     except Exception as e:
         await ctx.send("An exception occurred.  Plese check the log for more details.")
-        print("An exception occurred.... See Below: ")
-        print(e)
+        bot_logger.warning("An exception occured while queueuing a video or playlist.  See the log for more info.")
+        bot_logger.debug(e)
 
 
-async def PlayQ(ctx, voice):
-    """Command used to play the queue of songs/videos enqueued with PlayEnqueue."""
-    print("Running PlayQueue " + " on Guild " + ctx.message.guild.name)
+async def play_deq(ctx, voice):
+    """Plays the enqueued audio tracks in the voice channel.
+
+    This is a non-user-accessible function that plays any audio tracks that have been enqueued
+    using play_enq.  This function is looped in until the queue has been emptied.
+
+    Args:
+        ctx: Discord.py context object for the message to be sent in.
+        voice: Voice client for the server context that music is to be played in.
+            The value is not used, but is instead used to ensure a voice client
+            exists.
+    """
+    bot_logger.debug(f"Running PlayQueue on Guild {ctx.message.guild.name}")
+
     # Global variable declarations
-    global ServerProfiles
-    ThisServerProfile = ServerProfiles[ctx.message.guild.id]
-    ThisServerProfile.PlayingEvent.set()
-    ThisServerProfile.playingNOW = True
+    global SERVER_PROFILES
+    this_server_profile = SERVER_PROFILES[ctx.message.guild.id]
+    this_server_profile.PlayingEvent.set()
+    this_server_profile.playingNOW = True
 
     while True:
-        if not ThisServerProfile.InterruptedByHerald:  # If we're interrupted by Herald, we want to keep looping without doing anything until the flag is lowered.
-            ThisServerProfile.PlayingEvent.clear()
-            Current = ThisServerProfile.MusicQueue.get()  # Pop a song from the queue
+        if not this_server_profile.InterruptedByHerald:  # If we're interrupted by Herald, we want to keep looping, w/o
+                                                         # doing anything until the flag is lowered.
+            this_server_profile.PlayingEvent.clear()
+            curr = this_server_profile.MusicQueue.get()  # Pop a song from the queue
 
-            #file = download(Current[1])  # Download the song that was linked.
-            await DownloadSong(ctx.message.guild.id, Current[1])
-            file = ThisServerProfile.CurrentSongFile
-
-            CurrentSongFilePath = file[0]  # Take the file path for the downloaded song.
-            ThisServerProfile.CurrentSong = (CurrentSongFilePath, Current[1])
-            waiter_task = asyncio.create_task(WaitAndDelete(ThisServerProfile.PlayingEvent, CurrentSongFilePath, ThisServerProfile))
-
-            ThisServerProfile.vc.play(FFmpegPCMAudio(executable=FFmpegPCMAudio_FilePath, source=CurrentSongFilePath), after=lambda e: ThisServerProfile.PlayingEvent.set())
+            await download_song(ctx.message.guild.id, curr[1])
+            file = this_server_profile.CurrentSongFile
+            curr_song_filepath = file[0]  # Take the file path for the downloaded song.
+            this_server_profile.CurrentSong = (curr_song_filepath, curr[1])
+            waiter_task = asyncio.create_task(wait_and_delete(this_server_profile.PlayingEvent,
+                                                              curr_song_filepath,
+                                                              this_server_profile))
+            this_server_profile.vc.play(FFmpegPCMAudio(executable=FFMPEG_PCM_AUDIO_FILEPATH, source=curr_song_filepath),
+                                        after=lambda e: this_server_profile.PlayingEvent.set())
             await ctx.send("NOW PLAYING: " + file[1])
-            print("NOW PLAYING: " + file[1] + " On Guild " + ctx.message.guild.name)
-            ThisServerProfile.CurrentMusicStartTime = time.time()
+            bot_logger.debug("NOW PLAYING: " + file[1] + " On Guild " + ctx.message.guild.name)
+            this_server_profile.CurrentMusicStartTime = time.time()
             await waiter_task  # Wait until the waiter task is finished - which is when the music stops playing
-            while ThisServerProfile.SkippingNow:
+            while this_server_profile.SkippingNow:
                 await asyncio.sleep(1)
 
-            if ThisServerProfile.MusicQueue.qsize() == 0:  # When our queue is empty, we can leave since our work here is done.
-                ThisServerProfile.playingNOW = False
+            if this_server_profile.MusicQueue.qsize() == 0:  # When our queue is empty, we can leave vc
+                this_server_profile.playingNOW = False
                 await leave(ctx)
                 break
 
 
 # endregion
 
-# region Helper Functions
-def CalculateTimeStamp(Seconds):
-    """Returns a timestamp in format HH:MM:SS.MS, given a timestamp in seconds (integer)."""
-    if Seconds < 362439:  # This is the number of seconds equal to 99:99:99.00 in HH:MM:SS.MS
-        Hours = Seconds // 3600
-        Minutes = (Seconds % 3600) // 60
-        Seconds = Seconds % 60
-        TimeStampCode = str(Hours) + ":" + str(Minutes) + ":" + str(Seconds) + ".00"
-        return TimeStampCode
-    else:
-        return "99:99:99.00"
-
-
-async def WaitAndDelete(event, FilePath, ServerProfile):
-    """Takes an event and waits until it finishes before deleting the provided filepath."""
-    await event.wait()
-    print("Finished Playing.")
-    print("Skipping now: ", ServerProfile.SkippingNow)
-    if not ServerProfile.SkippingNow:
-        if not ServerProfile.InterruptedByHerald:
-            print("Deleting file and moving to next song:")
-            os.remove(FilePath)
-        else:
-            print("Interrupted by Herald, so adding song to lazy delete list to be cleared when leaving voice channel.")
-            ServerProfile.LazyDeleteSongs.append(FilePath)
-            ServerProfile.InterruptedByHerald = False
-
-async def DownloadSong(GuildID, url):
-    ThisServerProfile = ServerProfiles[GuildID]
-    ThisServerProfile.CurrentSongFile = await download(url)
-
-
-
-# endregion
 
 """STARTUP"""
 # Assume client refers to a discord.Client subclass...
 # Suppress the default configuration since we have our own
 # client.run(token, log_handler=None)
-if __name__ == "__main__":
-    print("About to run")
-    print("Looking for Herald Backup files")
-    for filename in os.listdir("HeraldBackups"):
-        #Download herald themes before connecting to discord
-        f = os.path.join("HeraldBackups", filename)
-        # checking if it is a file
-        if os.path.isfile(f) and os.path.splitext(f)[1] == ".json":
-            print(f)
-
-            with open(f, 'r') as backup:
-                print("File opened")
-                TempHeraldRestoration = json.load(backup)
-                print("Attempting to download")
-                try:
-                    for userID in TempHeraldRestoration.keys():
-                        print("Downloading " + TempHeraldRestoration[userID][2] + " for user with ID: " + userID)
-                        print(TempHeraldRestoration[userID][0])
-                        file = downloadHERALD(TempHeraldRestoration[userID][0], userID)
-                        print("Download successful.")
-                        TempHeraldRestoration[userID][1] = file[0]
-
-                except Exception as e:
-                    print("Error with opening HeraldBackup JSON")
-                    print(e)
-
-            with open(f, 'w') as backup:
-                try:
-                    # Write updated file locations to the backup JSON file
-                    json.dump(TempHeraldRestoration, backup)  # Write new file locations to the backup
-                except Exception as e:
-                    print("Error with writing to HeraldBackup JSON")
-                    print(e)
-
-    bot.run(token)
+bot.run(TOKEN, log_level=logging.DEBUG, log_handler=file_handler)
