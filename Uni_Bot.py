@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord import FFmpegPCMAudio
 from pytube import Playlist, YouTube
 import asyncio
-from VidDownloader import download, downloadHERALD
+from VidDownloader import download, download_herald
 import queue
 import Token
 import os
@@ -112,19 +112,21 @@ async def wait_and_delete(event, filepath, server_profile):
 dt_fmt = '%Y-%m-%d %H:%M:%S'
 formatter = logging.Formatter('{asctime} {levelname} {name}: {message}', dt_fmt, style='{')
 
-# Set up loggers
 discord_logger = logging.getLogger('discord')
 discord_logger.setLevel(logging.DEBUG)
 logging.getLogger('discord.http').setLevel(logging.INFO)
 bot_logger = logging.getLogger('unicron')
 bot_logger.setLevel(logging.DEBUG)
+vid_dl_logger = logging.getLogger('download')
+vid_dl_logger.setLevel(logging.DEBUG)
 
-# Send output to Console (Warning and up only)
+
+# Send output to Console (Warning+ only)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.WARNING)
 console_handler.setFormatter(formatter)
 
-# Create Handler to output log to files
+# Create Handler to output log to files (everything)
 file_handler = logging.handlers.TimedRotatingFileHandler(filename='Unicron_Testing.log',
                                                          encoding='utf-8',
                                                          when='midnight',
@@ -137,8 +139,9 @@ bot_logger.addHandler(console_handler)
 bot_logger.addHandler(file_handler)
 discord_logger.addHandler(console_handler)
 discord_logger.addHandler(file_handler)
+vid_dl_logger.addHandler(console_handler)
+vid_dl_logger.addHandler(file_handler)
 bot_logger.propogate = False
-discord_logger = False
 # endregion
 
 bot = commands.Bot(command_prefix=get_prefix, intents=INTENTS, case_insensitive=True)
@@ -154,17 +157,17 @@ async def on_ready():
     and server settings.
     """
 
-    bot_logger.info(f'We have logged in as {bot.user}')
+    bot_logger.info('We have logged in as %s', bot.user)
 
     global SERVER_PROFILES
     global SERVER_PREFIXES
 
     if not os.path.exists("Backups"):
         os.makedirs("Backups")
-    BackupFile = os.path.join("Backups", "Prefixes.json")
-    if os.path.exists(BackupFile):
+    backup_file = os.path.join("Backups", "Prefixes.json")
+    if os.path.exists(backup_file):
         bot_logger.debug("Restoring Custom Prefixes")
-        with open(BackupFile, "r") as PrefixBackup:
+        with open(backup_file, "r") as PrefixBackup:
             SERVER_PREFIXES = json.load(PrefixBackup)
 
         NewServerPrefixDict = {}
@@ -179,7 +182,7 @@ async def on_ready():
     bot_logger.info("Setting up Guild Profiles")
     for guild in bot.guilds:
         SERVER_PROFILES[guild.id] = Guild_Profile(guild)
-        bot_logger.debug(f"This server has ID {guild.id} and Name: {guild.name}")
+        bot_logger.debug("This server has ID %s and Name: %s", guild.id, guild.name)
 
         BackupFileName = str(guild.id) + ".json"
         BackupFolder = os.path.join("HeraldBackups", BackupFileName)
@@ -388,7 +391,7 @@ async def herald_set(ctx, url, start_time=0):
         end_time = start_time + 15  # If no timestamp was given, this is just the first 15 seconds.
 
     try:
-        file = downloadHERALD(url, hrld_key)  # Returns tuple containing the filepath and file name
+        file = download_herald(url, hrld_key)  # Returns tuple containing the filepath and file name
     except Exception as e:
         await ctx.send("ERROR: Herald Theme download failed.")
         bot_logger.error(f"ERROR: Herald Theme download failed for user {ctx.message.author.name}.")
