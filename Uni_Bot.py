@@ -19,6 +19,7 @@ TOKEN = Token.HiddenToken  # Pull the token from another file.
 SERVER_PROFILES = dict()  # Initializes a dictionary with server ids as keys to another dictionary.
 SERVER_PREFIXES = dict()  # Initializes a dictionary with server ids as keys to the command prefix for that server.
 CWD = os.getcwd()
+ACTIVITY = discord.Activity(name="Consuming the multiverse", type=discord.ActivityType.custom, state="Consuming the Multiverse")
 
 # WINDOWS:
 # You may need to change these filepaths
@@ -144,7 +145,7 @@ vid_dl_logger.addHandler(file_handler)
 bot_logger.propogate = False
 # endregion
 
-bot = commands.Bot(command_prefix=get_prefix, intents=INTENTS, case_insensitive=True)
+bot = commands.Bot(command_prefix=get_prefix, intents=INTENTS, case_insensitive=True, activity = ACTIVITY)
 client = discord.Client(intents=INTENTS)
 
 
@@ -242,6 +243,7 @@ class Guild_Profile():
         self.InterruptedByHerald = False
         self.LazyDeleteSongs = []  # List of songs to delete when the bot leaves vc that were put on hold due to Herald.
         self.CurrentSongFile = None
+        self.Game = dict()  # Dictionary for the game scores
 
     def __str__(self):
         """Creates a readable string format to read the Guild Profile Data.
@@ -785,7 +787,6 @@ async def play_deq(ctx, voice):
 
 
 # endregion
-
 
 """STARTUP"""
 # Assume client refers to a discord.Client subclass...
