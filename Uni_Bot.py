@@ -788,6 +788,115 @@ async def play_deq(ctx, voice):
 
 # endregion
 
+# region Quiz Mode
+@bot.command(name="Button", description="Click the button!")
+async def button(ctx):
+    role = discord.utils.find(lambda r: r.name == 'Game Master', ctx.message.guild.roles)
+    if role in ctx.message.author.roles:
+        view = QuizButtons("Option 1", "Option 2")
+        # button = discord.ui.Button(label="Click me")
+        # view.add_item(button)
+        await ctx.send(view = view)
+    else:
+        await ctx.send("You must be a game master to summon the buttons!")
+
+@bot.command(name="GameReset", description="Resets the game scores.")
+async def game_reset(ctx):
+    role = discord.utils.find(lambda r: r.name == 'Game Master', ctx.message.guild.roles)
+    if role in ctx.message.author.roles:
+        SERVER_PROFILES[ctx.message.guild.id].Game = dict()
+        ctx.send("Game scores have been reset")
+    else:
+        await ctx.send("You must be a game master to reset game scores!")
+
+@bot.command(name="GameStart", description="Starts a new game.  Allows participants to join in.")
+async def game_start(ctx):
+    role = discord.utils.find(lambda r: r.name == 'Game Master', ctx.message.guild.roles)
+    if role in ctx.message.author.roles:
+        SERVER_PROFILES[ctx.message.guild.id].Game = dict()
+
+        view = QuizStart(SERVER_PROFILES[ctx.message.guild.id].Game)
+        await ctx.send(content = "Join the game!", view = view)
+        
+    else:
+        await ctx.send("You must be a game master to reset game scores!")
+
+
+@bot.command(name="Quiz", description="Click the button!")
+async def quiz_mode(ctx):
+    #if # role doesnt exist
+    if "Game Master" not in ctx.guild.roles:
+        await ctx.send("No Game Master role exists.  Creating role. "
+                 "Please assign this role to yourself to control the quiz.")
+        await ctx.guild.create_role(name="Game Master")
+    
+    view = QuizButtons("Option 1", "Option 2")
+    # button = discord.ui.Button(label="Click me")
+    # view.add_item(button)
+    await ctx.send(view = view)
+
+
+class QuizStart(discord.ui.View):
+    
+    def __init__(self, game_dict = None):
+        super().__init__(timeout=600)
+        self.game = game_dict
+    
+
+    @discord.ui.button(label="Join Game", style=discord.ButtonStyle.green)
+    async def join_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.game[interaction.user.id] = 0
+        await interaction.response.send_message(f"{interaction.user.mention} You joined the game!")
+        #self.stop()
+    
+    @discord.ui.button(label="End Joining", style=discord.ButtonStyle.red)
+    async def end_button(self, interraction: discord.Interaction, button: discord.ui.Button):
+        role = discord.utils.find(lambda r: r.name == 'Game Master', interraction.guild.roles)
+        if role in interraction.user.roles:
+            await interraction.response.send_message("Game Joining Ended!")
+            self.stop()
+        else:
+            await interraction.response.send_message("You must be a game master to end joining!")
+
+
+class QuizButtons(discord.ui.View):
+
+    def __init__(self, button1_name = "A", button2_name = "B"):
+        self.button1_name = button1_name
+        self.button2_name = button2_name
+        super().__init__(timeout=600)
+        self.add_buttons()
+    
+    @discord.ui.button(label="Hello", style=discord.ButtonStyle.green)
+    async def hello_button(self, interraction: discord.Interaction, button: discord.ui.Button):
+        await interraction.response.send_message("World")
+        #self.stop()
+    
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
+    async def cancel_button(self, interraction: discord.Interaction, button: discord.ui.Button):
+        await interraction.response.send_message("Cancel")
+        self.stop()
+    
+    def add_buttons(self):
+        button_one = discord.ui.Button(label=self.button1_name)
+        
+        async def buttonexample(interaction: discord.Interaction):
+            await interaction.response.send_message("You pressed the button! " + self.button1_name)
+        
+        button_one.callback = buttonexample
+        self.add_item(button_one)
+
+        button_two = discord.ui.Button(label=self.button2_name)
+        async def buttonexample2(interaction: discord.Interaction):
+            await interaction.response.send_message("You pressed the button! " + self.button2_name)
+        
+        button_two.callback = buttonexample2
+        self.add_item(button_two)
+    
+
+
+# endregion
+
 """STARTUP"""
 # Assume client refers to a discord.Client subclass...
 # Suppress the default configuration since we have our own
